@@ -21,5 +21,14 @@
     "online_tests": "ab-test-analyst",
     "eda": "eda-analyst",
     "monitoring": "monitoring-analyst"
+  },
+  "evaluators": {
+    "regression": "regression-evaluator",
+    "binary_classification": "classification-evaluator",
+    "multiclass_classification": "classification-evaluator",
+    "forecasting": "forecasting-evaluator",
+    "bayesian_mmm": "bayesian-mmm-evaluator",
+    "ranking": "ranking-ctr-specialist",
+    "ctr": "ranking-ctr-specialist"
   }
 }

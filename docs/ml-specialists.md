@@ -13,6 +13,18 @@ Eight advisory agents that bring practitioner methods from Google, Meta, Microso
 | `ml-production-auditor` | Before launch / major release; periodically | ML Test Score (28 tests, 4 categories, score = min category) + hidden-technical-debt and skew checks | Breck, Cai, Nielsen, Salib, Sculley 2017 (Google); Sculley et al. 2015 (Google) |
 | `ab-test-analyst` | Online tests of model changes | OEC + guardrails, power, randomisation unit; SRM, A/A, peeking, novelty, Twyman's law before interpretation; CUPED | Kohavi, Tang, Xu *Trustworthy Online Controlled Experiments*; Deng et al. 2013 (Microsoft) |
 
+## Model-type evaluators
+
+Evaluation is routed by `task_type` (`configs/base.yaml`, set with `playbook.py new --task-type ...`) through `configs/team.json → evaluators` and the `model-evaluation` skill.
+
+| Evaluator | Model types | What it checks that generic evaluation misses | Primary sources |
+|---|---|---|---|
+| `regression-evaluator` | price, demand, revenue, duration | Loss consistent with the target functional (mean→RMSE, median→MAE, quantile→pinball); MAPE pitfalls; residual bias, heteroscedasticity, tails; interval coverage (conformal) | Gneiting, JASA 2011; Hyndman & Koehler 2006; scikit-learn; Angelopoulos & Bates 2021 |
+| `classification-evaluator` | binary, multiclass | PR-AUC under imbalance; calibration (reliability, Brier/log loss decomposition caveat; Platt/isotonic/temperature); cost-derived threshold tuned on held-out data; per-class CIs | scikit-learn calibration + threshold tuning; Saito & Rehmsmeier 2015; Niculescu-Mizil & Caruana 2005; Guo et al. 2017 |
+| `forecasting-evaluator` | demand, sales, traffic, capacity | Rolling-origin CV; information available at forecast time; MASE/RMSSE vs naive and seasonal naive; per-horizon accuracy and bias; pinball, coverage, Winkler, CRPS, skill scores; many-series aggregation (WRMSSE) | Hyndman & Athanasopoulos *FPP3*; Hyndman & Koehler 2006; M5 (Makridakis et al. 2022); Bergmeir et al. 2018 |
+| `bayesian-mmm-evaluator` | Meridian, PyMC-Marketing, Robyn-style, custom PyMC/Stan MMMs | R-hat < 1.01, bulk-ESS > 100/chain, divergences, E-BFMI; prior/posterior predictive checks; prior-driven vs data-driven channels; baseline negativity; share-of-effect vs share-of-spend; ROI intervals and P(ROI>1); lift-test calibration; parameter recovery on simulated data | Stan diagnostics + Vehtari et al. 2021; Gelman et al. *Bayesian Workflow*; Google Meridian + Jin et al. 2017 + Chan & Perry 2017; Meta Robyn; PyMC-Marketing |
+| `ranking-ctr-specialist` | ads, recommenders, CTR/CVR | Normalized entropy, calibration, position bias, freshness, delayed feedback | He et al. 2014; McMahan et al. 2013; Chapelle et al. 2014 |
+
 ## How they fit the team
 
 ```

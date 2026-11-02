@@ -26,6 +26,8 @@ MARKETPLACE = "mj2tang"
 PLUGIN = "agent-playbook"
 PLUGIN_REPO = "mj2tang/coding-agent-playbook"
 LOCK = ".agents/playbook.lock.json"
+TASK_TYPES = ["regression", "binary_classification", "multiclass_classification", "forecasting",
+              "bayesian_mmm", "ranking"]
 
 PERMISSIONS = {
     "allow": [
@@ -190,7 +192,7 @@ def cmd_new(a: argparse.Namespace) -> int:
         print(f"{target} is not empty; use `init` for existing projects (or --force).")
         return 1
     pkg = a.pkg or re.sub(r"\W", "_", a.name.lower()).strip("_")
-    subs = {"project": a.name, "pkg": pkg, "description": a.description}
+    subs = {"project": a.name, "pkg": pkg, "description": a.description, "task_type": a.task_type}
     s = Scaffolder(target, subs, a.force, a.dry_run)
     s.copy_tree(ROOT / "templates/ml-project", "")
     install_agent_setup(s, a.mode)
@@ -282,6 +284,8 @@ def main() -> int:
                             help="vendor: copy skills/agents/hooks into the repo (default). "
                                  "plugin: enable the agent-playbook Claude Code plugin instead.")
         if name == "new":
+            sp.add_argument("--task-type", default="binary_classification", choices=TASK_TYPES,
+                            help="routes evaluations to the matching evaluator agent (configs/team.json)")
             sp.add_argument("--bootstrap", action="store_true",
                             help="also run uv sync, make check, and record the first metrics baseline")
     a = p.parse_args()

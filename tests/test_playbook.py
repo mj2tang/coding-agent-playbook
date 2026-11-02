@@ -91,6 +91,15 @@ class TestScaffolder(unittest.TestCase):
             log = subprocess.run(["git", "-C", str(proj), "log", "--oneline"], capture_output=True, text=True)
             self.assertIn("Scaffold churn-model", log.stdout)
 
+    def test_task_type_routes_to_an_existing_evaluator(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = Path(tmp) / "fc"
+            run("new", str(proj), "--name", "fc", "--task-type", "forecasting")
+            self.assertIn("task_type: forecasting", (proj / "configs/base.yaml").read_text())
+            team = json.loads((proj / "configs/team.json").read_text())
+            for agent in team["evaluators"].values():
+                self.assertTrue((proj / ".claude/agents" / f"{agent}.md").exists(), agent)
+
     def test_init_preserves_existing_files_and_settings(self):
         with tempfile.TemporaryDirectory() as tmp:
             repo = Path(tmp)

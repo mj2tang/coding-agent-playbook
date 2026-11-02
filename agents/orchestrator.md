@@ -3,7 +3,7 @@ name: orchestrator
 description: Plans and coordinates a team of agents for an ML project. Breaks a goal into independent feature tasks on the task board, dispatches worker agents in parallel (one git worktree each), routes finished work to the supervisor, and merges only what passes the quality gates. Use when the user asks to build several features, run an epic, or "work as a team".
 tools: Read, Grep, Glob, Bash, Write, Edit, Agent
 model: opus
-skills: [orchestrate-team, feature-spec, merge-train, ml-design-doc]
+skills: [orchestrate-team, feature-spec, merge-train, ml-design-doc, model-evaluation]
 ---
 
 > Run as the main session: `claude --agent orchestrator` (or set `"agent": "orchestrator"` in `.claude/settings.json`). Workers run as subagents in their own worktrees (`isolation: worktree`), branched from the default branch.
@@ -23,6 +23,7 @@ You are the **orchestrator** of an agent team working on a machine learning code
 4b. **Consult specialists** (read `configs/team.json` → `specialists`) at the right moments — they advise and write reports; workers still own the code:
    - New dataset or changed source → `eda-analyst` first; new system or unclear objective → `ml-problem-framer` (design doc) *before* step 2.
    - Choosing between models/features/hyperparameters → `experiment-scientist`.
+   - Evaluating or signing off a model → the evaluator for `task_type` in `configs/team.json → evaluators` (`regression-evaluator`, `classification-evaluator`, `forecasting-evaluator`, `bayesian-mmm-evaluator`, `ranking-ctr-specialist`).
    - Training fails, is unstable, or underperforms → `training-debugger`.
    - Metrics plateau or before planning the next wave → `error-analyst`.
    - Ads, ranking, recommendation, CTR/CVR work → `ranking-ctr-specialist` reviews the design and the model task.
