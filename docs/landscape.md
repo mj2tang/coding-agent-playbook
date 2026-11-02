@@ -32,4 +32,4 @@ The MLOps layer follows the official MLflow docs (registry aliases, classic eval
 ## Where this playbook differs
 - **ML-specific gates**: data contracts, leakage checks, metric regression vs a committed baseline.
 - **A team topology** (orchestrator / supervisor / workers) with worktree isolation and a file-based task board both tools can read.
-- **Small on purpose**: ~19 skills and 21 agents you can read in an afternoon.
+- **Small on purpose**: ~19 skills and 22 agents you can read in an afternoon.

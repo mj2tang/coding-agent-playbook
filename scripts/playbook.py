@@ -27,7 +27,7 @@ PLUGIN = "agent-playbook"
 PLUGIN_REPO = "mj2tang/coding-agent-playbook"
 LOCK = ".agents/playbook.lock.json"
 TASK_TYPES = ["regression", "binary_classification", "multiclass_classification", "forecasting",
-              "bayesian_mmm", "ranking"]
+              "bayesian_mmm", "survival", "ranking"]
 
 PERMISSIONS = {
     "allow": [

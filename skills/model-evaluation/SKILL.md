@@ -1,6 +1,6 @@
 ---
 name: model-evaluation
-description: Route a model evaluation to the right model-type evaluator (regression, classification, time series forecasting, Bayesian MMM, ranking/CTR) using configs/team.json and the project's task_type, and apply the evaluation rules every type shares - correct split, baselines, champion comparison, slices, and uncertainty. Use when asked to evaluate, compare, or sign off a model. Not for writing metric code (eval-worker) or monitoring production batches (production-monitoring).
+description: Route a model evaluation to the right model-type evaluator (regression, classification, time series forecasting, Bayesian MMM, survival/time-to-event, ranking/CTR) using configs/team.json and the project's task_type, and apply the evaluation rules every type shares - correct split, baselines, champion comparison, slices, and uncertainty. Use when asked to evaluate, compare, or sign off a model. Not for writing metric code (eval-worker) or monitoring production batches (production-monitoring).
 ---
 
 # Model evaluation
@@ -14,6 +14,7 @@ Read `task_type` in `configs/base.yaml` (or infer it from the target and design 
 | `binary_classification` / `multiclass_classification` | `classification-evaluator` | ROC-AUC + PR-AUC, calibration, cost-based threshold |
 | `forecasting` | `forecasting-evaluator` | rolling-origin CV, MASE/RMSSE vs seasonal naive, per-horizon and probabilistic scores |
 | `bayesian_mmm` | `bayesian-mmm-evaluator` | R-hat/ESS/divergences, predictive checks, baseline + ROI plausibility, lift-test calibration |
+| `survival` | `survival-evaluator` | censoring review, Uno's C, time-dependent AUC, IPCW Brier/IBS vs Kaplan–Meier, horizon calibration (ICI), PH checks |
 | `ranking` / `ctr` | `ranking-ctr-specialist` | normalized entropy, calibration, position bias, freshness |
 
 ## 2. Rules every evaluation follows

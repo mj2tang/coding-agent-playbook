@@ -29,6 +29,7 @@
     "forecasting": "forecasting-evaluator",
     "bayesian_mmm": "bayesian-mmm-evaluator",
     "ranking": "ranking-ctr-specialist",
-    "ctr": "ranking-ctr-specialist"
+    "ctr": "ranking-ctr-specialist",
+    "survival": "survival-evaluator"
   }
 }
