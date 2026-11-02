@@ -1,0 +1,13 @@
+{
+  "name": "mj2tang",
+  "owner": { "name": "Eric Tang", "url": "https://github.com/mj2tang" },
+  "metadata": { "description": "Eric Tang's coding-agent plugins" },
+  "plugins": [
+    {
+      "name": "agent-playbook",
+      "source": "./",
+      "description": "Portable skills, subagents, and guardrail hooks for coding agents",
+      "category": "workflow"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+seed: 42
+data:
+  source: sklearn_breast_cancer   # example dataset; replace with your loader
+  valid_size: 0.25
+features:
+  log_transform: [mean area, worst area]
+model:
+  type: logistic_regression
+  C: 1.0
+  max_iter: 1000
+artifacts_dir: artifacts

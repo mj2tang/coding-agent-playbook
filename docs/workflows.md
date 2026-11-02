@@ -13,7 +13,7 @@
 
 ## Code review ✅
 - Review with a fresh session/agent, not the one that wrote the code.
-- Give it a checklist (see [`templates/review-checklist.md`](../templates/review-checklist.md)).
+- Give it a checklist (see [`templates/review-checklist.md`](../templates/prompts/review-checklist.md)).
 - Ask for findings ranked by severity with a concrete failure scenario each — filters out style noise.
 
 ## Debugging ✅

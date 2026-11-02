@@ -1,0 +1,12 @@
+{
+  "max_parallel_workers": 3,
+  "integration_branch": "main",
+  "max_review_rounds": 2,
+  "workers": {
+    "feature": "feature-worker",
+    "data": "data-worker",
+    "eval": "eval-worker"
+  },
+  "supervisor": "supervisor",
+  "headless_runner": "claude"
+}

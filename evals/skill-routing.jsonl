@@ -1,0 +1,18 @@
+{"prompt": "Build the three features in tasks/EPIC.md in parallel as a team", "expect": "orchestrate-team"}
+{"prompt": "We need lag features, a new data source, and slice metrics this week - split it up across agents", "expect": "orchestrate-team"}
+{"prompt": "Fix the typo in README.md", "expect": null}
+{"prompt": "Write a task file for adding target encoding to the categorical columns", "expect": "feature-spec"}
+{"prompt": "You are a worker. Execute tasks/T-004-holiday-features.md", "expect": "worker-protocol"}
+{"prompt": "Land the approved branches task/T-002 and task/T-003", "expect": "merge-train"}
+{"prompt": "Review this training code for leakage and reproducibility problems", "expect": "ml-quality-gates"}
+{"prompt": "Add a new orders table loader and make sure bad rows are caught", "expect": "data-contract"}
+{"prompt": "Did my change to the model make validation ROC-AUC worse than baseline?", "expect": "eval-regression"}
+{"prompt": "Try whether gradient boosting beats logistic regression - just an experiment", "expect": "experiment-protocol"}
+{"prompt": "Rename variable x to n_rows in one function", "expect": null}
+{"prompt": "Refactor the feature module into separate files - plan it first", "expect": "plan-first"}
+{"prompt": "Implement a function that winsorises numeric columns at the 1st/99th percentile", "expect": "tdd-loop"}
+{"prompt": "I'm done with the change, can you wrap up?", "expect": "verify-before-done"}
+{"prompt": "Validation AUC dropped from 0.91 to 0.84 after yesterday's merge - why?", "expect": "systematic-debugging"}
+{"prompt": "Remember for next time that make gate needs uv sync first", "expect": "update-context-file"}
+{"prompt": "What does the evaluation module do?", "expect": null}
+{"prompt": "Explore in a notebook how the target is distributed", "expect": null}

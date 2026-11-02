@@ -1,39 +1,35 @@
 # Claude Code
 
-🟠 Tips specific to [Claude Code](https://docs.claude.com/en/docs/claude-code/overview).
+🟠 Tips specific to [Claude Code](https://code.claude.com/docs). Dated November 2026.
 
 ## Memory files
-- `CLAUDE.md` at repo root (shared, committed), `CLAUDE.local.md` (personal, gitignored), `~/.claude/CLAUDE.md` (all projects). Subdirectory `CLAUDE.md` files load when the agent works there.
-- `/init` drafts a starting `CLAUDE.md` from the codebase — then trim it.
-- Already have `AGENTS.md`? Point to it from `CLAUDE.md` (e.g. `@AGENTS.md`) so both tools share one source.
+- `CLAUDE.md` at repo root (shared), `CLAUDE.local.md` (personal, gitignored), `~/.claude/CLAUDE.md` (all projects). Nested `CLAUDE.md` files load when working in that directory.
+- Share one source of truth with Codex: `CLAUDE.md` containing `@AGENTS.md` plus Claude-only notes (what this playbook scaffolds).
+- `/init` drafts a starting file — then trim it.
 
-## Modes and session control
-- **Plan mode** (Shift+Tab to cycle modes): read-only exploration and planning. Use for anything non-trivial.
-- `/clear` between tasks; `/compact` to summarise a long session and keep going.
-- `Esc` interrupts; double-`Esc` lets you rewind to an earlier message.
-- `!command` runs a shell command and puts the output in context.
+## Subagents (`.claude/agents/*.md`)
+- Frontmatter: `name`, `description` (required), plus `tools`, `model`, `skills` (preloaded into context), `isolation: worktree` (own temporary git worktree), `background`, `permissionMode`, `memory`, `hooks`.
+- `claude --agent orchestrator` (or `"agent": "orchestrator"` in `.claude/settings.json`) makes the **main session** take on an agent's prompt, tools, and model — that's how the orchestrator runs here.
+- Subagents can spawn subagents (default depth 3; `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH`). Remove `Agent` from `tools` to stop a role from delegating.
+- Give reviewers read-only tools; give workers `isolation: worktree` for safe parallelism.
+
+## Skills (`.claude/skills/<name>/SKILL.md`)
+- Same Agent Skills format Codex uses — this playbook keeps one copy in `.agents/skills/` and symlinks `.claude/skills` to it.
+- Loaded on demand by description; preload into a subagent with `skills:`.
+
+## Hooks
+- Deterministic automation in `settings.json` → `hooks`: `PreToolUse` (exit 2 blocks with a message to Claude), `PostToolUse`, `Stop`, `SessionStart`, `PreCompact`, …
+- This playbook's `guard.py` blocks push/reset/remote-data ops, protects `.env`, `data/raw/`, gate thresholds and baselines, and auto-formats edited files.
+- Rule of thumb: must *always* happen → hook; needs judgement → skill.
 
 ## Permissions
-- Allow-list safe, frequent commands (test runner, linter, `git status`) in `.claude/settings.json` so you aren't approving them all day.
-- Keep `git push`, deploys, and anything destructive behind a prompt.
-- `/permissions` to inspect and edit rules.
+- `permissions.allow` for the gate commands, `ask` for push/rebaseline/new deps, `deny` for secrets and raw data. `Edit(...)` rules cover all file-editing tools.
 
-## Extending it
-| Mechanism | Use it for | Lives in |
-|---|---|---|
-| **Slash commands / skills** | Reusable workflows ("write release notes", "review this PR") | `.claude/skills/<name>/SKILL.md` |
-| **Subagents** | Focused side tasks with their own context (search, review, test-writing) | `.claude/agents/*.md` |
-| **Hooks** | Deterministic automation: format on edit, block edits to protected paths, notify on finish | `settings.json` → `hooks` |
-| **MCP servers** | Tools and data: issue trackers, databases, browsers, docs | `claude mcp add …` / `.mcp.json` |
+## Plugins
+- A plugin bundles skills, agents, hooks, MCP servers: `.claude-plugin/plugin.json` + default folders. Validate with `claude plugin validate .`.
+- Team auto-install: `extraKnownMarketplaces` + `enabledPlugins` in the project's `.claude/settings.json` (what `playbook.py init --mode plugin` writes).
 
-Rule of thumb: if it must *always* happen, use a hook; if it's judgement, use a skill.
-
-## Parallel and headless
-- Run several sessions in separate **git worktrees**, one task each.
-- `claude -p "…"` runs non-interactively — useful in scripts and CI (pair with tight permissions).
-- Have one session write code and a fresh session review it; a clean context catches more.
-
-## Habits that pay off
-- Ask it to write the failing test first, confirm it fails, then implement.
-- For UI work, give it a way to see the result (screenshots, browser automation).
-- End a session by asking "what should go into CLAUDE.md from this session?"
+## Session habits
+- Plan mode (Shift+Tab) for non-trivial work; `/clear` between tasks; `/compact` on long sessions.
+- `claude -p "…"` for headless runs (scripts, CI, `run-wave.sh`).
+- End sessions with the `update-context-file` skill so lessons land in `AGENTS.md`.

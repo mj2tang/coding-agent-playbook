@@ -1,0 +1,12 @@
+{
+  "name": "mj2tang",
+  "interface": { "displayName": "mj2tang plugins" },
+  "plugins": [
+    {
+      "name": "agent-playbook",
+      "source": { "source": "local", "path": "./" },
+      "policy": { "installation": "AVAILABLE", "authentication": "ON_INSTALL" },
+      "category": "Developer Tools"
+    }
+  ]
+}

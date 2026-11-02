@@ -1,0 +1,7 @@
+{
+  "metrics": {
+    "roc_auc": { "direction": "higher", "tolerance": 0.002, "suspicious_gain": 0.03 },
+    "log_loss": { "direction": "lower", "tolerance": 0.01 },
+    "accuracy": { "direction": "higher", "tolerance": 0.01 }
+  }
+}
