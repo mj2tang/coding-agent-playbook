@@ -1,7 +1,7 @@
 {
   "name": "agent-playbook",
   "displayName": "Agent Playbook",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Portable skills, subagents, and guardrail hooks for coding agents: plan-first, TDD, verification, debugging, review, and context-file upkeep",
   "author": {
     "name": "Eric Tang",

@@ -33,6 +33,8 @@ Adapted from Lauren Tan's ("poteto") approach in [pstack](https://github.com/pot
 - **Decision trail.** One TSV row per dispatch, verdict, merge, revert, pivot, or blocker (`decision-log`), local in `.audit/` by default; commit a copy for large unattended runs.
 - **Lessons become mechanisms.** A correction becomes a type/contract, test, lint, hook rule, or helper before it becomes `AGENTS.md` text (`encode-lesson`).
 - **Autonomous runs have a finish line.** A checkable exit condition up front, stop after two no-progress waves, never relax the condition; `pause-and-resume` leaves `tasks/RESUME.md` for a clean handoff.
+- **Cross-model review and arena.** High-stakes merges get a panel of reviewers on different model families (`interrogate`, `scripts/agent-team/panel_review.py`; `configs/team.json → review_panel`), where agreement across models means high confidence. Unprecedented design choices get `arena`: parallel attempts, a judge on another model, pick and graft.
+- **Blinded skill evals.** Before changing a skill or agent prompt, `scripts/skill_eval.py` runs both versions on organic tasks in neutral projects and has a blind judge score anonymised diffs.
 - **Settle forks by evidence.** Observable questions (which feature set scores better?) get a probe, not a question to the human.
 
 ## Specialists

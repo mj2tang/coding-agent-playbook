@@ -11,6 +11,7 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - run: git config --global user.email ci@example.com && git config --global user.name ci
+      - run: pip install ruff
       - run: python -m unittest discover -s tests -v
   scaffolded-ml-project:
     runs-on: ubuntu-latest

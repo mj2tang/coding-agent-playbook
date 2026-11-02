@@ -21,3 +21,5 @@
 {"prompt": "Pick up the run that the previous agent paused yesterday", "expect": "pause-and-resume"}
 {"prompt": "Keep a record of what you decide during this overnight run so I can review it", "expect": "decision-log"}
 {"prompt": "Rename this local variable", "expect": null}
+{"prompt": "Tear this promotion logic change apart before we merge it - get a second opinion from another model", "expect": "interrogate"}
+{"prompt": "We have no idea how to structure the new feature pipeline - try a few different designs in parallel and pick the best", "expect": "arena"}

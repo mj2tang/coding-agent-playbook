@@ -29,7 +29,8 @@ PLUGIN = "agent-playbook"
 PLUGIN_REPO = "mj2tang/coding-agent-playbook"
 LOCK = ".agents/playbook.lock.json"
 # Genie Code runs single-agent in notebooks: no subagents, worktrees, or hooks, so team skills are left out.
-GENIE_EXCLUDED_SKILLS = {"orchestrate-team", "worker-protocol", "merge-train", "decision-log", "pause-and-resume"}
+GENIE_EXCLUDED_SKILLS = {"orchestrate-team", "worker-protocol", "merge-train", "decision-log", "pause-and-resume",
+                         "interrogate", "arena"}
 GENIE_SKILL_NOTE = """> **On Databricks Genie Code:** this skill mentions `make` targets. In a notebook (`%sh` cell) or the
 > web terminal of the project's Git folder, use the equivalents below; for scheduled or shared runs use the
 > asset-bundle jobs (`train`, `monitor`, `promote_approve`, `rollback`) from the Jobs UI.
@@ -65,6 +66,7 @@ PERMISSIONS = {
         "Bash(git add:*)", "Bash(git commit:*)", "Bash(git switch:*)", "Bash(git checkout:*)",
         "Bash(git branch:*)", "Bash(git worktree:*)", "Bash(git merge:*)", "Bash(git revert:*)",
         "Bash(scripts/agent-team/run-wave.sh:*)", "Bash(python3 scripts/agent-team/audit.py:*)",
+        "Bash(python3 scripts/agent-team/panel_review.py:*)",
     ],
     "ask": ["Bash(make rebaseline)", "Bash(make promote APPROVE=1:*)", "Bash(make rollback)",
             "Bash(git push:*)", "Bash(uv add:*)"],

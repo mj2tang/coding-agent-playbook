@@ -37,5 +37,15 @@
     "ranking": "ranking-ctr-specialist",
     "ctr": "ranking-ctr-specialist",
     "survival": "survival-evaluator"
-  }
+  },
+  "review_panel": [
+    {
+      "name": "claude",
+      "cmd": "claude -p --permission-mode plan --model opus"
+    },
+    {
+      "name": "codex",
+      "cmd": "codex exec --sandbox read-only -"
+    }
+  ]
 }
