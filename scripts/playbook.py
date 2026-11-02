@@ -31,14 +31,16 @@ PERMISSIONS = {
     "allow": [
         "Bash(make setup)", "Bash(make check)", "Bash(make lint)", "Bash(make types)",
         "Bash(make test)", "Bash(make data-check)", "Bash(make eval)", "Bash(make gate)",
-        "Bash(make train:*)", "Bash(uv sync)", "Bash(uv run pytest:*)", "Bash(uv run ruff:*)",
+        "Bash(make train:*)", "Bash(make eda)", "Bash(make select)", "Bash(make tune)",
+        "Bash(make promote)", "Bash(make monitor:*)", "Bash(uv sync)", "Bash(uv run pytest:*)", "Bash(uv run ruff:*)",
         "Bash(uv run mypy:*)", "Bash(uv run python -m:*)",
         "Bash(git status:*)", "Bash(git diff:*)", "Bash(git log:*)", "Bash(git show:*)",
         "Bash(git add:*)", "Bash(git commit:*)", "Bash(git switch:*)", "Bash(git checkout:*)",
         "Bash(git branch:*)", "Bash(git worktree:*)", "Bash(git merge:*)", "Bash(git revert:*)",
         "Bash(scripts/agent-team/run-wave.sh:*)",
     ],
-    "ask": ["Bash(make rebaseline)", "Bash(git push:*)", "Bash(uv add:*)"],
+    "ask": ["Bash(make rebaseline)", "Bash(make promote APPROVE=1:*)", "Bash(make rollback)",
+            "Bash(git push:*)", "Bash(uv add:*)"],
     "deny": ["Read(./.env)", "Read(./.env.*)", "Edit(./data/raw/**)"],
 }
 

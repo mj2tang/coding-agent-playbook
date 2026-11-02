@@ -8,6 +8,8 @@ dependencies = [
     "pandas>=2.1",
     "scikit-learn>=1.4",
     "pyyaml>=6.0",
+    "scipy>=1.11",
+    "mlflow>=3.5",
 ]
 
 [dependency-groups]
@@ -22,15 +24,17 @@ packages = ["src/{{pkg}}"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-markers = ["data: data-contract tests (make data-check)", "slow: long-running tests"]
+markers = ["data: data-contract tests (make data-check)", "slow: long-running tests", "mlflow: tests that use a temporary MLflow tracking store"]
 addopts = "-q -m 'not slow'"
+filterwarnings = ["ignore::DeprecationWarning", "ignore::FutureWarning", "ignore::UserWarning:mlflow.*"]
 
 [tool.ruff]
-line-length = 100
+line-length = 110
 src = ["src", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "NPY", "PD"]
+ignore = ["PD101"]
 
 [tool.mypy]
 python_version = "3.10"

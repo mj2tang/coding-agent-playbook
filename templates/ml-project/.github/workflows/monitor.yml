@@ -1,0 +1,37 @@
+name: monitor
+# Scheduled drift + retraining check. Set the repository variable MONITOR_BATCH_PATH (or adapt the
+# "Fetch batch" step to pull the latest scoring batch from your warehouse/bucket).
+on:
+  schedule:
+    - cron: "0 6 * * 1"   # Mondays 06:00 UTC
+  workflow_dispatch:
+permissions:
+  contents: read
+  issues: write
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    if: ${{ vars.MONITOR_BATCH_PATH != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync
+      - name: Fetch batch
+        run: cp "${{ vars.MONITOR_BATCH_PATH }}" batch.csv
+      - name: Drift + retraining decision
+        id: monitor
+        run: |
+          set +e
+          make monitor CURRENT=batch.csv
+          echo "code=$?" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        with: { name: monitoring-report, path: reports/monitoring.json }
+      - name: Open issue when retraining is recommended
+        if: steps.monitor.outputs.code == '3'
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          gh issue create --title "Retraining recommended ($(date -u +%F))" \
+            --body "$(printf 'make monitor recommended retraining.\n\n```json\n%s\n```\n\nNext: monitoring-analyst triage, then train -> promote gate -> human approval.' "$(jq '{drift: {dataset_drift: .drift.dataset_drift, drift_share: .drift.drift_share, drifted_columns: .drift.drifted_columns}, retrain: .retrain}' reports/monitoring.json)")"
+      - name: Fail on unexpected errors
+        if: steps.monitor.outputs.code != '0' && steps.monitor.outputs.code != '3'
+        run: exit 1

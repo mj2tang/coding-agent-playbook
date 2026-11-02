@@ -5,7 +5,8 @@
   "workers": {
     "feature": "feature-worker",
     "data": "data-worker",
-    "eval": "eval-worker"
+    "eval": "eval-worker",
+    "mlops": "mlops-engineer"
   },
   "supervisor": "supervisor",
   "headless_runner": "claude",
@@ -17,6 +18,8 @@
     "ranking_ctr": "ranking-ctr-specialist",
     "llm_evals": "llm-eval-engineer",
     "production_audit": "ml-production-auditor",
-    "online_tests": "ab-test-analyst"
+    "online_tests": "ab-test-analyst",
+    "eda": "eda-analyst",
+    "monitoring": "monitoring-analyst"
   }
 }

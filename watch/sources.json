@@ -1,0 +1,16 @@
+{
+  "sources": [
+    {
+      "name": "OpenAI developers blog",
+      "feed": "https://developers.openai.com/rss.xml",
+      "include": "developers\\.openai\\.com/blog/",
+      "update": "docs/codex.md"
+    },
+    {
+      "name": "MLflow releases",
+      "feed": "https://github.com/mlflow/mlflow/releases.atom",
+      "include": "",
+      "update": "skills/mlflow-lifecycle/SKILL.md"
+    }
+  ]
+}

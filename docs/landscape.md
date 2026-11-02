@@ -19,6 +19,9 @@ Surveyed November 2026. This playbook is original work; these projects shaped it
 ## ML practitioner sources
 The ML specialist agents draw on published method rather than agent repos: Google (Rules of ML, ML Test Score, Hidden Technical Debt, Deep Learning Tuning Playbook), Karpathy's training recipe, Hamel Husain on evals, Kohavi et al. on online experiments, Eugene Yan's design docs, and Facebook/Google/Criteo CTR papers. See [ml-specialists.md](ml-specialists.md).
 
+## MLOps sources
+The MLOps layer follows the official MLflow docs (registry aliases, classic evaluation + `validate_evaluation_results`, MCP server) and ships alongside — not instead of — the official [mlflow/skills](https://github.com/mlflow/skills) (GenAI tracing and evaluation). Pipeline staging and checks follow Google's MLOps levels, Evidently's drift defaults, Made With ML, and cookiecutter-data-science. See [ml-lifecycle.md](ml-lifecycle.md).
+
 ## Common patterns across the best repos
 1. **Skills are the portable unit.** Same `SKILL.md` works in Claude Code and Codex; agents/hooks are tool-specific wrappers.
 2. **Process over prompts.** The most-starred repos encode a workflow (plan → test → verify → review), not clever wording.
@@ -29,4 +32,4 @@ The ML specialist agents draw on published method rather than agent repos: Googl
 ## Where this playbook differs
 - **ML-specific gates**: data contracts, leakage checks, metric regression vs a committed baseline.
 - **A team topology** (orchestrator / supervisor / workers) with worktree isolation and a file-based task board both tools can read.
-- **Small on purpose**: ~14 skills and 14 agents you can read in an afternoon.
+- **Small on purpose**: ~18 skills and 17 agents you can read in an afternoon.

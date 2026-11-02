@@ -1,0 +1,55 @@
+name: watch-sources
+# Weekly: detect new OpenAI developers blog posts and MLflow releases (watch/sources.json),
+# open an issue listing them, and record them in watch/state.json.
+# Optional: if the ANTHROPIC_API_KEY secret is set, Claude drafts a PR updating the playbook
+# docs from the new posts - always for human review, never merged automatically.
+on:
+  schedule:
+    - cron: "0 7 * * 1"   # Mondays 07:00 UTC
+  workflow_dispatch:
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  id-token: write
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    env:
+      HAS_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Check feeds
+        id: watch
+        run: |
+          python3 scripts/watch_sources.py > new.md
+          if [ -s new.md ]; then echo "found=true" >> "$GITHUB_OUTPUT"; fi
+      - name: Open issue
+        if: steps.watch.outputs.found == 'true'
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          gh issue create --title "New sources to review ($(date -u +%F))" \
+            --body "$(printf 'New posts/releases since the last check:\n\n%s\n\nReview and update the suggested docs/skills.' "$(cat new.md)")"
+      - name: Record seen items
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add watch/state.json
+          git diff --cached --quiet || (git commit -m "watch: record seen sources" && git push)
+      - name: Draft doc updates with Claude (optional)
+        if: steps.watch.outputs.found == 'true' && env.HAS_KEY == 'true'
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            New sources were published (listed in new.md). For each post relevant to coding agents,
+            Codex/Claude Code practice, skills, evals, or MLflow:
+            1. Read the post (WebFetch).
+            2. Update the doc or skill named under its source with concise, paraphrased, practical
+               guidance (no long quotes), adding the post to resources.md.
+            3. Skip posts that are not relevant; list them in the PR description with one line why.
+            Open a pull request on a new branch titled "docs: updates from new sources (<date>)".
+            Do not modify skills' gate commands, hooks, or scaffolding code.
+          claude_args: "--allowedTools WebFetch,Read,Edit,Write,Bash(git:*),Bash(gh pr create:*)"

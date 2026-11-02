@@ -3,7 +3,7 @@
 PY ?= uv run
 CONFIG ?= configs/base.yaml
 
-.PHONY: setup check lint types test data-check train eval gate rebaseline clean
+.PHONY: setup check lint types test data-check eda select tune train eval gate promote rollback monitor mlflow-ui rebaseline clean
 
 setup:
 	uv sync
@@ -23,6 +23,16 @@ test:
 data-check:
 	$(PY) pytest -m data
 
+eda:
+	$(PY) python -m {{pkg}}.analysis.eda --config $(CONFIG)
+
+select:
+	$(PY) python -m {{pkg}}.features.select_report --config $(CONFIG)
+
+tune:
+	$(PY) python -m {{pkg}}.models.tune --config $(CONFIG)
+
+# Trains, logs to MLflow, and registers a new model version (no alias change).
 train:
 	$(PY) python -m {{pkg}}.models.train --config $(CONFIG)
 
@@ -32,9 +42,23 @@ eval:
 gate: eval
 	$(PY) python scripts/check_metrics.py --current metrics/current.json --baseline metrics/baseline.json --rules configs/gates.json
 
+# Champion/challenger check; add APPROVE=1 (human decision) to move @champion.
+promote:
+	$(PY) python -m {{pkg}}.registry.promote --config $(CONFIG) $(if $(APPROVE),--approve,) $(if $(VERSION),--version $(VERSION),)
+
+rollback:
+	$(PY) python -m {{pkg}}.registry.promote --config $(CONFIG) --rollback
+
+# Drift + retraining decision for a scoring batch: make monitor CURRENT=path/to/batch.csv (exit 3 = retrain)
+monitor:
+	$(PY) python -m {{pkg}}.monitoring.run --config $(CONFIG) --current $(CURRENT)
+
+mlflow-ui:
+	$(PY) mlflow ui --backend-store-uri sqlite:///mlflow.db
+
 # Human-approved only: commit separately with the reason in the message.
 rebaseline: eval
 	cp metrics/current.json metrics/baseline.json
 
 clean:
-	rm -rf .pytest_cache .ruff_cache .mypy_cache metrics/current.json artifacts
+	rm -rf .pytest_cache .ruff_cache .mypy_cache metrics/current.json artifacts reports

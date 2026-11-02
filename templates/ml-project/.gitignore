@@ -16,3 +16,7 @@ data/processed/*
 *.joblib
 .ipynb_checkpoints/
 .DS_Store
+mlflow.db
+mlartifacts/
+reports/
+configs/experiments/tuned.yaml

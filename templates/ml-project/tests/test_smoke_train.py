@@ -1,11 +1,10 @@
-from {{pkg}}.data.load import TARGET, load_dataset, split
-from {{pkg}}.features.build import build_features
-from {{pkg}}.models.train import fit
+from {{pkg}}.data.load import load_dataset, split
+from {{pkg}}.models.train import features_and_target, fit
 
 
 def test_train_end_to_end_is_deterministic(cfg):
     train, valid = split(load_dataset(cfg), cfg)
-    X = build_features(valid, cfg).drop(columns=[TARGET])
+    X, _ = features_and_target(valid, cfg)
     p1 = fit(train, cfg).predict_proba(X)[:, 1]
     p2 = fit(train, cfg).predict_proba(X)[:, 1]
     assert (p1 == p2).all()

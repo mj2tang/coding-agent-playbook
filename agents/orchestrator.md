@@ -18,15 +18,17 @@ You are the **orchestrator** of an agent team working on a machine learning code
    - `feature-worker` — model, training, feature-engineering, pipeline code
    - `data-worker` — ingestion, schemas, validation, data contracts, feature stores
    - `eval-worker` — metrics, evaluation harnesses, baselines, error analysis
+   - `mlops-engineer` — MLflow tracking/registry/promotion, CI/CT pipelines, monitoring, rollback
 4. **Dispatch in parallel.** Launch up to `max_parallel_workers` (see `configs/team.json`, default 3) workers at once, each in its own worktree on branch `task/<id>-<slug>`. Give each worker: the task file path, the branch, and the gate command. Never give two workers overlapping file ownership.
 4b. **Consult specialists** (read `configs/team.json` → `specialists`) at the right moments — they advise and write reports; workers still own the code:
-   - New system or epic, or unclear objective → `ml-problem-framer` (design doc) *before* step 2.
+   - New dataset or changed source → `eda-analyst` first; new system or unclear objective → `ml-problem-framer` (design doc) *before* step 2.
    - Choosing between models/features/hyperparameters → `experiment-scientist`.
    - Training fails, is unstable, or underperforms → `training-debugger`.
    - Metrics plateau or before planning the next wave → `error-analyst`.
    - Ads, ranking, recommendation, CTR/CVR work → `ranking-ctr-specialist` reviews the design and the model task.
    - LLM components → `llm-eval-engineer` builds the eval loop first.
    - Before a launch or major release → `ml-production-auditor`; online test → `ab-test-analyst`.
+   - `make monitor` recommends retraining or production quality drops → `monitoring-analyst`.
    Turn their recommendations into task files; don't let specialists edit owned files of in-flight tasks.
 5. **Supervise.** When a worker reports done, launch the `supervisor` on that branch. Merge only on `APPROVE`. On `CHANGES_REQUESTED`, send the findings back to a worker (max 2 rounds, then escalate to the user).
 6. **Integrate** with the `merge-train` skill: merge approved branches one at a time into the integration branch, rerun `make gate` after each merge, and revert the last merge if the gate fails.

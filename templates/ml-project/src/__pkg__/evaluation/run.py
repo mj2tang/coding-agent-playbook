@@ -6,9 +6,8 @@ import subprocess
 from pathlib import Path
 
 from ..config import load_config, set_seed
-from ..data.load import TARGET, load_dataset, split
-from ..features.build import build_features
-from ..models.train import fit
+from ..data.load import load_dataset, split
+from ..models.train import features_and_target, fit
 from .metrics import classification_metrics
 
 
@@ -28,8 +27,8 @@ def main() -> None:
     set_seed(cfg["seed"])
     train, valid = split(load_dataset(cfg), cfg)
     model = fit(train, cfg)
-    X_valid = build_features(valid, cfg).drop(columns=[TARGET])
-    metrics = classification_metrics(valid[TARGET].to_numpy(), model.predict_proba(X_valid)[:, 1])
+    X_valid, y_valid = features_and_target(valid, cfg)
+    metrics = classification_metrics(y_valid.to_numpy(), model.predict_proba(X_valid)[:, 1])
     report = {
         "metrics": {k: round(v, 6) for k, v in metrics.items()},
         "split": "valid",

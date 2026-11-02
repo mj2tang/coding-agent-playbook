@@ -9,3 +9,26 @@ model:
   C: 1.0
   max_iter: 1000
 artifacts_dir: artifacts
+mlflow:
+  tracking_uri: sqlite:///mlflow.db   # local; point at a shared tracking server for teams
+  experiment: "{{project}}"
+  registered_model: "{{pkg}}"
+feature_selection:
+  near_constant_threshold: 0.99
+  corr_threshold: 0.95
+  leakage_auc: 0.98
+tuning:
+  n_iter: 10
+  cv: 5
+  scoring: roc_auc
+  param_distributions:
+    clf__C: [0.01, 0.03, 0.1, 0.3, 1.0, 3.0, 10.0]
+promotion:
+  slice_column: mean radius   # candidate must not regress on any bucket of this column
+  slice_bins: 3
+monitoring:
+  p_value: 0.05
+  distance: 0.1
+  drift_share: 0.5
+  max_model_age_days: 30
+  max_metric_drop: 0.02
