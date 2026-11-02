@@ -83,7 +83,8 @@ def trust_level(rows: list[dict[str, str]], settings: dict[str, int]) -> tuple[i
             streak += 1
             if streak >= settings["promote_after"] and level < settings["max_workers"]:
                 level, streak = level + 1, 0
-                why.append(f"{r['ts']} {r['task']}: {settings['promote_after']} clean approvals -> {level} workers")
+                n = settings["promote_after"]
+                why.append(f"{r['ts']} {r['task']}: {n} clean approvals -> {level} workers")
         elif result in RESET:
             streak = 0
         elif result in NEGATIVE:
@@ -114,7 +115,8 @@ def main(argv: list[str] | None = None) -> int:
         settings = trust_settings()
         level, streak, why = trust_level(rows, settings)
         if a.explain:
-            print(f"allowed workers: {level} (start {settings['start_workers']}, max {settings['max_workers']})")
+            start, cap = settings["start_workers"], settings["max_workers"]
+            print(f"allowed workers: {level} (start {start}, max {cap})")
             print(f"clean approvals toward next level: {streak}/{settings['promote_after']}")
             for line in why or ["no level changes yet"]:
                 print(f"  {line}")
