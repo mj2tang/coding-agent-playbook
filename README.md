@@ -41,7 +41,8 @@ How the team works: **[docs/agent-team.md](docs/agent-team.md)**.
 | New ML project | `playbook.py new <dir> --name <name> [--bootstrap]` |
 | Databricks ML project | `playbook.py new <dir> --name <name> --platform databricks [--catalog c --schema s]` |
 | Genie Code skills bundle | `playbook.py init <dir> --target genie-code` |
-| Existing repo | `playbook.py init <dir>` — never overwrites; writes `AGENTS.playbook.md` if you already have `AGENTS.md`, merges `.claude/settings.json` |
+| Existing repo | `playbook.py init <dir>` — additive only: skills, agents, task board, team scripts, and `AGENTS.playbook.md`. Never creates or edits your `AGENTS.md`/`CLAUDE.md`, source, or structure; adds only the playbook's own script permissions to `.claude/settings.json`. Opt-ins: `--profile ml` (pipeline map, gates config, ML make-target permissions), `--guardrails` (guard hook: blocks push/reset, asks before rebaseline/promotion), `--link` (appends a one-line pointer to `AGENTS.playbook.md` in `CLAUDE.md`/`AGENTS.md`) |
+| Check before installing | `python3 scripts/check_install_safety.py . /tmp/scratch ~/my-repo` installs into a *copy* of your repo every way and fails if any existing file changes, anything is deleted, git state moves, or a re-install isn't a no-op |
 | Update vendored files | `playbook.py sync <dir>` — updates untouched files, skips ones you edited (`--force` to overwrite) |
 | Claude Code plugin only | `/plugin install agent-playbook --marketplace mj2tang/coding-agent-playbook` (or `/plugin marketplace add mj2tang/coding-agent-playbook` then `/plugin install agent-playbook@mj2tang`) |
 | Codex marketplace | `codex plugin marketplace add mj2tang/coding-agent-playbook` |

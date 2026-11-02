@@ -184,7 +184,34 @@ class TestScaffolder(unittest.TestCase):
             settings = json.loads((repo / ".claude/settings.json").read_text())
             self.assertEqual(settings["model"], "opus")
             self.assertIn("Bash(x)", settings["permissions"]["allow"])
+            self.assertNotIn("hooks", settings)  # guardrails are opt-in for existing repos
+            self.assertNotIn("Bash(git -C:*)", settings["permissions"]["allow"])  # only safe with the guard
+            self.assertFalse((repo / "CLAUDE.md").exists())  # never created or edited without --link
+            self.assertFalse((repo / "configs").exists())  # ML extras only with --profile ml
+
+    def test_init_opt_ins(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp)
+            (repo / "CLAUDE.md").write_text("# my rules\n")
+            run("init", str(repo), "--profile", "ml", "--guardrails", "--link")
+            settings = json.loads((repo / ".claude/settings.json").read_text())
             self.assertIn("PreToolUse", settings["hooks"])
+            self.assertIn("Bash(git -C:*)", settings["permissions"]["allow"])
+            self.assertTrue((repo / "docs/pipeline-map/README.md").exists())
+            claude = (repo / "CLAUDE.md").read_text()
+            self.assertTrue(claude.startswith("# my rules\n") and claude.count("@AGENTS.playbook.md") == 1)
+            run("init", str(repo), "--profile", "ml", "--guardrails", "--link")  # idempotent
+            self.assertEqual((repo / "CLAUDE.md").read_text(), claude)
+
+    def test_init_keeps_existing_claude_skills_dir(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp)
+            (repo / ".claude/skills/mine").mkdir(parents=True)
+            (repo / ".claude/skills/mine/SKILL.md").write_text("---\nname: mine\ndescription: x\n---\n")
+            run("init", str(repo))
+            self.assertFalse((repo / ".claude/skills").is_symlink())
+            self.assertTrue((repo / ".claude/skills/mine/SKILL.md").exists())
+            self.assertTrue((repo / ".claude/skills/tdd-loop/SKILL.md").exists())
 
     def test_plugin_mode_enables_plugin_instead_of_vendoring_agents(self):
         with tempfile.TemporaryDirectory() as tmp:
