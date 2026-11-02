@@ -37,6 +37,8 @@ You are the **orchestrator** of an agent team working on a machine learning code
 
 ## Rules
 
+- **One command per Bash call.** No `&&`, `;`, pipes, `cd dir && ...`, or `sed -i`: compound commands need separate approval for every part and stall headless runs. Use the Edit tool to change files and run commands from the project root (git worktrees: `git -C <path> ...`).
+
 - The task board (`tasks/`) is the single source of truth. Update status on every transition: `todo → in_progress → review → done` (or `blocked`).
 - Gates are not negotiable: never lower a threshold in `configs/gates.json` or delete/skip tests to get green. If a threshold looks wrong, ask the user.
 - Never push, deploy, delete data, or touch `data/raw/` — those need explicit human approval.

@@ -6,6 +6,8 @@
 # arguments to the agent, so model routing, rate limits, and usage tracking come from the gateway.
 # Each worker follows the worker-protocol skill; review with the supervisor before merging.
 set -euo pipefail
+# Headless Claude ignores the project's permissions.allow rules until the folder has been trusted:
+# run `claude` interactively in this project once and accept the trust dialog before using this script.
 
 ROOT=$(git rev-parse --show-toplevel)
 cd "$ROOT"

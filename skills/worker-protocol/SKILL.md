@@ -5,6 +5,10 @@ description: The contract every worker agent follows - claim one task file, stay
 
 # Worker protocol
 
+## Shell discipline
+- **One command per Bash call.** No `&&`, `;`, pipes, `cd dir && ...`, or `sed -i`: compound commands need separate approval for every part and stall headless runs. Use the Edit tool to change files and run commands from the project root (git worktrees: `git -C <path> ...`).
+
+## Steps
 1. **Read** the task file, `AGENTS.md`, and the code you'll touch. If the task is ambiguous or conflicts with the code, stop and return `STATUS: blocked` with the question — don't guess.
 2. **Branch:** you are in your own worktree. Create/checkout `task/<id>-<slug>` if you're not already on it.
 3. **Stay in scope:** edit only the task's owned files (plus new test files). Need another file? Return `blocked` and say why.

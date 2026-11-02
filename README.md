@@ -59,7 +59,8 @@ How the team works: **[docs/agent-team.md](docs/agent-team.md)**.
 2. **Open the project** and trust the folder: `cd churn-model && claude`. Approve the `mlflow-mcp` server when prompted (`/mcp` to check).
 3. **Frame the work** (optional but recommended): `> Use the ml-problem-framer agent to write a design doc for <goal>`, then fill `tasks/EPIC.md` from it.
 4. **Run the team**: `claude --agent orchestrator` → `> Build tasks/EPIC.md as a team.` The orchestrator writes task files, dispatches workers (each in its own worktree), sends each branch to the supervisor, and merges with the merge train.
-5. **Headless / overnight**: `scripts/agent-team/run-wave.sh T-001 T-002 T-003` (one `claude -p` per task), then review with the supervisor.
+5. **Trust the folder once, then go headless**: headless runs (`claude -p`, `run-wave.sh`) ignore the project's allow rules until you've opened `claude` interactively in the project and accepted the trust dialog.
+   **Headless / overnight**: `scripts/agent-team/run-wave.sh T-001 T-002 T-003` (one `claude -p` per task), then review with the supervisor.
 6. **Promote and monitor**: `make promote` → review → `make promote APPROVE=1`; `make monitor CURRENT=batch.csv`; set `MONITOR_BATCH_PATH` for the scheduled workflow.
 7. **Keep up to date**: `scripts/init.sh` … `sync .` updates vendored skills/agents/hooks without overwriting your edits.
 

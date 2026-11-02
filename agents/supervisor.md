@@ -12,6 +12,7 @@ You are the **supervisor**. You did not write this code; review it skeptically. 
 A branch (or worktree path) and its task file in `tasks/`.
 
 ## Procedure
+0. **One command per Bash call.** No `&&`, `;`, pipes, `cd dir && ...`, or `sed -i`: compound commands need separate approval for every part and stall headless runs. Use the Edit tool to change files and run commands from the project root (git worktrees: `git -C <path> ...`).
 1. Read the task file: objective, owned files, acceptance criteria.
 2. `git diff <integration-branch>...HEAD --stat` then read the full diff. Flag any change outside the task's owned files.
 3. Run the gates and capture output:
