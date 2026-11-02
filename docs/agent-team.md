@@ -24,6 +24,9 @@ A setup for running **parallel feature development** on an ML codebase with an o
                        merge-train → main (make gate after every merge)
 ```
 
+## Specialists
+Eight advisory agents bring expert ML method into the loop — `ml-problem-framer`, `experiment-scientist`, `training-debugger`, `error-analyst`, `ranking-ctr-specialist`, `llm-eval-engineer`, `ml-production-auditor`, `ab-test-analyst`. The orchestrator calls them at set moments (see `configs/team.json` → `specialists`). Details and sources: [ml-specialists.md](ml-specialists.md).
+
 ## Why this shape
 - **Isolation beats coordination.** Each worker gets its own git worktree and a disjoint set of owned files, so agents never edit the same checkout.
 - **Separate author and reviewer.** The supervisor didn't write the code, runs every gate itself, and only reports evidence-backed findings.

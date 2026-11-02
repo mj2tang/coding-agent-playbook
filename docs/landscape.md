@@ -16,6 +16,9 @@ Surveyed November 2026. This playbook is original work; these projects shaped it
 | [VoltAgent/awesome-claude-code-subagents](https://github.com/VoltAgent/awesome-claude-code-subagents) | 26k | 100+ specialised subagents | Narrow, role-specific agent prompts |
 | [agentsmd/agents.md](https://github.com/agentsmd/agents.md) | 25k | The open AGENTS.md format | AGENTS.md as the single source of truth |
 
+## ML practitioner sources
+The ML specialist agents draw on published method rather than agent repos: Google (Rules of ML, ML Test Score, Hidden Technical Debt, Deep Learning Tuning Playbook), Karpathy's training recipe, Hamel Husain on evals, Kohavi et al. on online experiments, Eugene Yan's design docs, and Facebook/Google/Criteo CTR papers. See [ml-specialists.md](ml-specialists.md).
+
 ## Common patterns across the best repos
 1. **Skills are the portable unit.** Same `SKILL.md` works in Claude Code and Codex; agents/hooks are tool-specific wrappers.
 2. **Process over prompts.** The most-starred repos encode a workflow (plan → test → verify → review), not clever wording.
@@ -26,4 +29,4 @@ Surveyed November 2026. This playbook is original work; these projects shaped it
 ## Where this playbook differs
 - **ML-specific gates**: data contracts, leakage checks, metric regression vs a committed baseline.
 - **A team topology** (orchestrator / supervisor / workers) with worktree isolation and a file-based task board both tools can read.
-- **Small on purpose**: ~13 skills and 6 agents you can read in an afternoon.
+- **Small on purpose**: ~14 skills and 14 agents you can read in an afternoon.

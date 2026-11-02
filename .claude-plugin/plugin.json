@@ -1,11 +1,22 @@
 {
   "name": "agent-playbook",
   "displayName": "Agent Playbook",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Portable skills, subagents, and guardrail hooks for coding agents: plan-first, TDD, verification, debugging, review, and context-file upkeep",
-  "author": { "name": "Eric Tang", "url": "https://github.com/mj2tang" },
+  "author": {
+    "name": "Eric Tang",
+    "url": "https://github.com/mj2tang"
+  },
   "homepage": "https://github.com/mj2tang/coding-agent-playbook",
   "repository": "https://github.com/mj2tang/coding-agent-playbook",
   "license": "MIT",
-  "keywords": ["skills", "agents", "hooks", "tdd", "code-review", "workflow", "codex"]
+  "keywords": [
+    "skills",
+    "agents",
+    "hooks",
+    "tdd",
+    "code-review",
+    "workflow",
+    "codex"
+  ]
 }

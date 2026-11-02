@@ -24,7 +24,8 @@ A branch (or worktree path) and its task file in `tasks/`.
    - **Correctness:** shapes/dtypes asserted at boundaries; metrics computed on the right split; no silent NaN handling.
    - **Tests:** new behavior has tests; tests were not weakened, skipped, or made trivially true.
    - **Gates untouched:** `configs/gates.json` and `metrics/baseline.json` unchanged unless the task explicitly says so.
-5. Only report findings you can tie to a file:line or a command output.
+5. If the change alters model behaviour, also ask: does it serve the decision and error costs in the task/design doc, and did it beat the simple baseline? If training looks broken, recommend `training-debugger`; if gains look too good, flag possible leakage.
+6. Only report findings you can tie to a file:line or a command output.
 
 ## Output (exactly this shape)
 ```

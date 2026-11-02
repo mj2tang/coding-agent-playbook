@@ -8,5 +8,15 @@
     "eval": "eval-worker"
   },
   "supervisor": "supervisor",
-  "headless_runner": "claude"
+  "headless_runner": "claude",
+  "specialists": {
+    "framing": "ml-problem-framer",
+    "experiments": "experiment-scientist",
+    "training_debug": "training-debugger",
+    "error_analysis": "error-analyst",
+    "ranking_ctr": "ranking-ctr-specialist",
+    "llm_evals": "llm-eval-engineer",
+    "production_audit": "ml-production-auditor",
+    "online_tests": "ab-test-analyst"
+  }
 }

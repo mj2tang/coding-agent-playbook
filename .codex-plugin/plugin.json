@@ -1,18 +1,30 @@
 {
   "name": "agent-playbook",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Portable skills for coding agents: plan-first, TDD, verification, debugging, review, and context-file upkeep",
-  "author": { "name": "Eric Tang", "url": "https://github.com/mj2tang" },
+  "author": {
+    "name": "Eric Tang",
+    "url": "https://github.com/mj2tang"
+  },
   "homepage": "https://github.com/mj2tang/coding-agent-playbook",
   "repository": "https://github.com/mj2tang/coding-agent-playbook",
   "license": "MIT",
-  "keywords": ["skills", "tdd", "code-review", "workflow"],
+  "keywords": [
+    "skills",
+    "tdd",
+    "code-review",
+    "workflow"
+  ],
   "skills": "./skills/",
   "interface": {
     "displayName": "Agent Playbook",
     "shortDescription": "Plan, test, verify, debug, and review workflows for coding agents",
     "developerName": "Eric Tang",
     "category": "Developer Tools",
-    "capabilities": ["Interactive", "Read", "Write"]
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ]
   }
 }

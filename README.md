@@ -18,7 +18,8 @@ Add the team to an **existing** repo: `... | bash -s -- init .` · Update later:
 | Layer | Contents |
 |---|---|
 | **Agent team** | `orchestrator` (main session) · `feature-worker` · `data-worker` · `eval-worker` (each `isolation: worktree`) · `supervisor` (read-only gatekeeper) · `code-reviewer` |
-| **Skills** (Claude Code + Codex) | Team: `orchestrate-team`, `feature-spec`, `worker-protocol`, `merge-train` · ML: `ml-quality-gates`, `data-contract`, `eval-regression`, `experiment-protocol` · Engineering: `plan-first`, `tdd-loop`, `verify-before-done`, `systematic-debugging`, `update-context-file` |
+| **ML specialists** | `ml-problem-framer` · `experiment-scientist` · `training-debugger` · `error-analyst` · `ranking-ctr-specialist` · `llm-eval-engineer` · `ml-production-auditor` · `ab-test-analyst` — grounded in Google's Rules of ML, ML Test Score & Tuning Playbook, Karpathy, Hamel Husain, Kohavi, and Facebook/Google CTR papers ([details](docs/ml-specialists.md)) |
+| **Skills** (Claude Code + Codex) | Team: `orchestrate-team`, `feature-spec`, `worker-protocol`, `merge-train` · ML: `ml-design-doc`, `ml-quality-gates`, `data-contract`, `eval-regression`, `experiment-protocol` · Engineering: `plan-first`, `tdd-loop`, `verify-before-done`, `systematic-debugging`, `update-context-file` |
 | **Guardrail hooks** | Block `git push`/`reset --hard`/remote-data ops; protect `.env`, `data/raw/`, gate thresholds, and metric baselines; auto-format edits |
 | **ML project skeleton** | `src/<pkg>/{data,features,models,evaluation}`, data contracts, split-before-fit pipeline, known-answer metric tests, `configs/`, CI |
 | **Quality gates** | `make check` (ruff, mypy, pytest) · `make data-check` (contracts) · `make gate` (metrics vs committed baseline with per-metric tolerance + leakage "suspicious gain" warning) |
@@ -58,6 +59,7 @@ How the team works: **[docs/agent-team.md](docs/agent-team.md)**.
 | Guide | What's inside |
 |---|---|
 | [Team of agents for ML](docs/agent-team.md) | Topology, lifecycle of a feature, running it, tuning, failure modes |
+| [ML specialist agents](docs/ml-specialists.md) | 8 expert-method agents, when they're used, sources, and a review of ML agents in popular repos |
 | [Foundations](docs/foundations.md) | Context files, prompt shape, plan → implement → verify |
 | [Claude Code](docs/claude-code.md) | Subagents, `--agent`, worktree isolation, skills, hooks, permissions, plugins |
 | [Codex](docs/codex.md) | AGENTS.md chain, skills, code review rules, long-horizon tasks, `codex exec` (from the OpenAI developers blog) |
