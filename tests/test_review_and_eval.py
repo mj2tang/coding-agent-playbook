@@ -118,7 +118,7 @@ class TestShippedScriptsLint(unittest.TestCase):
         if shutil.which("ruff") is None:
             self.skipTest("ruff not installed")
         files = [str(p) for p in (ROOT / "templates/agent-config/scripts/agent-team").glob("*.py")]
-        common = ["--line-length", "110"]
+        common = ["--line-length", "110", "--target-version", "py310"]  # mirror the template's pyproject
         lint = subprocess.run(["ruff", "check", *common, "--select", "E,F,I,B,UP,NPY,PD", *files],
                               capture_output=True, text=True)
         self.assertEqual(lint.returncode, 0, lint.stdout)
