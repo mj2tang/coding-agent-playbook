@@ -18,7 +18,13 @@ def main() -> int:
     if not Path(a.baseline).exists():
         print(f"No baseline at {a.baseline}. A human should run `make rebaseline` and commit it.")
         return 1
-    cur = json.loads(Path(a.current).read_text())["metrics"]
+    current = json.loads(Path(a.current).read_text())
+    if str(current.get("git_sha", "")).endswith("-dirty"):
+        print(
+            "warning: metrics were computed on uncommitted changes (git_sha ends in -dirty); "
+            "commit, then re-run before using them as proof"
+        )
+    cur = current["metrics"]
     base = json.loads(Path(a.baseline).read_text())["metrics"]
     rules = json.loads(Path(a.rules).read_text())["metrics"]
     passed, rows = compare_metrics(cur, base, rules)

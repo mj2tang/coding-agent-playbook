@@ -14,9 +14,9 @@ python3 scripts/agent-team/audit.py log <phase> <task> <actor> <decision> <why> 
 - **phase**: plan, dispatch, verify, review, merge, monitor, pause, ...
 - **evidence**: a pointer - commit SHA, `file:line`, artifact path, MLflow run ID. Never a paragraph.
 - **result**: use these words exactly when they apply, because the trust ladder reads them:
-  `approved` (supervisor approved on the first round, no human rework) · `changes_requested` · `merged` · `reverted` · `human_rework` (a human had to fix or redo agent work) · `blocked` · `progress` / `no_progress` (autonomous-run iterations) · or a short predicate state (`GATE: PASS`, `pixel-diff 0`).
+  `approved` (supervisor approved on the first round, no human rework) · `approved_after_rework` (approved in a later round; neutral for trust) · `changes_requested` · `merged` · `reverted` · `human_rework` (a human had to fix or redo agent work) · `blocked` · `progress` / `no_progress` (autonomous-run iterations) · or a short predicate state (`GATE: PASS`, `pixel-diff 0`).
 
-Plain words, as you'd tell a teammate. One row per decision point, not per command.
+Run it from the project root with the relative path `python3 scripts/agent-team/audit.py ...` (absolute paths don't match the permission rules). Plain words, as you'd tell a teammate. One row per decision point, not per command.
 
 ## Who logs what
 | Actor | Rows |

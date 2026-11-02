@@ -2,20 +2,13 @@
 
 import argparse
 import json
-import subprocess
 from pathlib import Path
 
 from ..config import load_config, set_seed
 from ..data.load import load_dataset, split
+from ..gitinfo import git_sha
 from ..models.train import features_and_target, fit
 from .metrics import classification_metrics
-
-
-def git_sha() -> str:
-    try:
-        return subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], text=True).strip()
-    except Exception:
-        return "unknown"
 
 
 def main() -> None:

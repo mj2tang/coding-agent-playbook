@@ -23,6 +23,7 @@ import argparse
 import csv
 import json
 import os
+import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -30,6 +31,18 @@ from pathlib import Path
 COLUMNS = ["ts", "phase", "task", "actor", "decision", "why", "evidence", "result"]
 POSITIVE = {"approved"}
 RESET = {"changes_requested"}
+NEUTRAL = {
+    "approved_after_rework",
+    "merged",
+    "blocked",
+    "progress",
+    "no_progress",
+    "dispatched",
+    "planned",
+    "paused",
+    "encoded",
+    "started",
+}
 NEGATIVE = {"reverted", "human_rework"}
 DEFAULT_TRUST = {"start_workers": 1, "max_workers": 3, "promote_after": 3}
 
@@ -108,6 +121,12 @@ def main(argv: list[str] | None = None) -> int:
     if a.cmd == "log":
         row = {c: getattr(a, c) for c in COLUMNS[1:]}
         row["ts"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        result = row["result"].strip().lower()
+        known = POSITIVE | RESET | NEGATIVE | NEUTRAL
+        if result not in known and not re.match(r"^[A-Z ]+:", row["result"].strip()):
+            vocab = ", ".join(sorted(known))
+            note = f"note: result {row['result']!r} is not in the vocabulary ({vocab}); treated as neutral"
+            print(note, file=sys.stderr)
         append(row)
         return 0
     rows = read()

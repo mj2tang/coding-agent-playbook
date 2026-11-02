@@ -6,21 +6,15 @@ model whose versions are promoted with aliases (@champion, @challenger, @previou
 
 from __future__ import annotations
 
-import subprocess
 from collections.abc import Iterator
 from contextlib import contextmanager
 from typing import Any
 
 import mlflow
 
+from .gitinfo import git_sha
+
 CHAMPION, CHALLENGER, PREVIOUS = "champion", "challenger", "previous-champion"
-
-
-def git_sha() -> str:
-    try:
-        return subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], text=True).strip()
-    except Exception:
-        return "unknown"
 
 
 def configure(cfg: dict[str, Any]) -> str:
@@ -51,3 +45,39 @@ def start_run(cfg: dict[str, Any], run_name: str, config_path: str, **tags: str)
         params = {k: v for k, v in flatten(cfg).items() if not k.startswith("mlflow.")}
         mlflow.log_params(params)
         yield run
+
+
+def describe(cfg: dict[str, Any], limit: int = 10) -> str:
+    """Read-only summary of the registered model: versions, aliases, source commit, valid metrics."""
+    name = configure(cfg)
+    client = mlflow.MlflowClient()
+    try:
+        versions = client.search_model_versions(f"name='{name}'")
+    except Exception as e:  # registry not created yet
+        return f"no registered model {name!r} yet ({e.__class__.__name__})"
+    rows = [f"registered model: {name}", "version  aliases                      git_sha        valid metrics"]
+    for v in sorted(versions, key=lambda v: int(v.version), reverse=True)[:limit]:
+        if v.run_id is None:  # registered from a URI without a tracked run
+            rows.append(f"{v.version:<8} {'-':<28} {'?':<14} (no run)")
+            continue
+        run = client.get_run(v.run_id)
+        metrics = ", ".join(
+            f"{k.removeprefix('valid_')}={x:.4f}"
+            for k, x in sorted(run.data.metrics.items())
+            if k.startswith("valid_")
+        )
+        aliases = ",".join(f"@{a}" for a in v.aliases) or "-"
+        rows.append(f"{v.version:<8} {aliases:<28} {run.data.tags.get('git_sha', '?'):<14} {metrics}")
+    return "\n".join(rows)
+
+
+if __name__ == "__main__":
+    import argparse
+
+    from .config import load_config
+
+    parser = argparse.ArgumentParser(description="Show registered model versions (read-only).")
+    parser.add_argument("--config", default="configs/base.yaml")
+    parser.add_argument("--set", action="append", default=[], metavar="KEY=VALUE")
+    args = parser.parse_args()
+    print(describe(load_config(args.config, args.set)))

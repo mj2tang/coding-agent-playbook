@@ -63,6 +63,27 @@ class TestGuard(unittest.TestCase):
                     "rm data/raw/a.csv", "dvc push"]:
             self.assertEqual(self.guard("bash", {"command": cmd}), 2, cmd)
 
+    def test_blocks_git_with_global_options(self):
+        for cmd in ["git -C ../wt push origin main", "git -c user.name=x push", "git -C /p/wt reset --hard HEAD",
+                    "git -C wt clean -fd"]:
+            self.assertEqual(self.guard("bash", {"command": cmd}), 2, cmd)
+
+    def ask_reason(self, cmd):
+        p = subprocess.run([sys.executable, str(ROOT / "hooks/scripts/guard.py"), "bash"],
+                           input=json.dumps({"tool_input": {"command": cmd}}), capture_output=True, text=True)
+        if p.returncode != 0 or not p.stdout.strip():
+            return None
+        out = json.loads(p.stdout)["hookSpecificOutput"]
+        return out["permissionDecision"]
+
+    def test_human_approval_actions_force_a_prompt(self):
+        for cmd in ["make rebaseline", "make -C wt rebaseline", "make promote APPROVE=1", "make rollback",
+                    "uv run python -m pkg.registry.promote --config c --approve", "uv add polars",
+                    "make bundle-deploy TARGET=prod", "make bundle-promote-approve"]:
+            self.assertEqual(self.ask_reason(cmd), "ask", cmd)
+        for cmd in ["make promote", "make -C wt check", "git -C wt status", "make bundle-deploy TARGET=dev"]:
+            self.assertIsNone(self.ask_reason(cmd), cmd)
+
     def test_allows_normal_work(self):
         for cmd in ["make check", "uv run pytest -q", "git commit -m 'T-1: x'", "git worktree add ../w -b task/T-1"]:
             self.assertEqual(self.guard("bash", {"command": cmd}), 0, cmd)

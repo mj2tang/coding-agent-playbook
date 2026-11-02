@@ -3,7 +3,7 @@
 PY ?= uv run
 CONFIG ?= configs/base.yaml
 
-.PHONY: setup check lint types test data-check eda select tune train eval gate promote rollback monitor mlflow-ui rebaseline clean
+.PHONY: setup check lint types test data-check eda select tune train eval gate promote rollback monitor runs mlflow-ui rebaseline clean
 
 setup:
 	uv sync
@@ -52,6 +52,10 @@ rollback:
 # Drift + retraining decision for a scoring batch: make monitor CURRENT=path/to/batch.csv (exit 3 = retrain)
 monitor:
 	$(PY) python -m {{pkg}}.monitoring.run --config $(CONFIG) --current $(CURRENT)
+
+# Read-only: registered versions, aliases, source commit, valid metrics.
+runs:
+	$(PY) python -m {{pkg}}.tracking --config $(CONFIG)
 
 mlflow-ui:
 	$(PY) mlflow ui --backend-store-uri sqlite:///mlflow.db

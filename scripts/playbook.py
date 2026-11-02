@@ -65,6 +65,8 @@ PERMISSIONS = {
         "Bash(git status:*)", "Bash(git diff:*)", "Bash(git log:*)", "Bash(git show:*)",
         "Bash(git add:*)", "Bash(git commit:*)", "Bash(git switch:*)", "Bash(git checkout:*)",
         "Bash(git branch:*)", "Bash(git worktree:*)", "Bash(git merge:*)", "Bash(git revert:*)",
+        # -C forms used to inspect and verify worktrees; push/reset/clean are blocked by the guard hook
+        "Bash(git -C:*)", "Bash(make -C:*)", "Bash(make runs)",
         "Bash(scripts/agent-team/run-wave.sh:*)", "Bash(python3 scripts/agent-team/audit.py:*)",
         "Bash(python3 scripts/agent-team/panel_review.py:*)",
     ],

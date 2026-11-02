@@ -11,6 +11,8 @@
 - The MLflow run ID and registered version printed by `make train`, with params matching the config.
 - Valid-split metrics logged on that run.
 
+Check with `make runs` (read-only): the new version, its aliases, and its `git_sha` (must match HEAD, never `-dirty`).
+
 ## What usually lies
 - A model trained in a notebook or an earlier session — check the run's `git_sha` tag equals HEAD.
 - "Training finished" while the registered version is an older one — read the printed version number.

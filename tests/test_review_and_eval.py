@@ -126,5 +126,26 @@ class TestShippedScriptsLint(unittest.TestCase):
         self.assertEqual(fmt.returncode, 0, fmt.stdout)
 
 
+class TestRenderedTemplateLint(unittest.TestCase):
+    """A rendered ML project must pass its own ruff config - seconds here vs minutes in the bootstrap job."""
+
+    def test_rendered_project_passes_its_own_ruff(self):
+        if shutil.which("ruff") is None:
+            self.skipTest("ruff not installed")
+        for platform in ("local", "databricks"):
+            with tempfile.TemporaryDirectory() as tmp:
+                proj = Path(tmp) / "lint-check"
+                subprocess.run([sys.executable, str(ROOT / "scripts/playbook.py"), "new", str(proj), "--name",
+                                "lint-check", "--platform", platform], check=True, capture_output=True)
+                targets = ["src", "tests", "scripts"]
+                # PD901 was removed from recent ruff; ignore it so older local versions agree with CI.
+                lint = subprocess.run(["ruff", "check", "--extend-ignore", "PD901", *targets], cwd=proj,
+                                      capture_output=True, text=True)
+                self.assertEqual(lint.returncode, 0, f"{platform}: {lint.stdout}")
+                fmt = subprocess.run(["ruff", "format", "--check", *targets], cwd=proj, capture_output=True,
+                                     text=True)
+                self.assertEqual(fmt.returncode, 0, f"{platform}: {fmt.stdout}")
+
+
 if __name__ == "__main__":
     unittest.main()

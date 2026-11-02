@@ -33,7 +33,7 @@ def read_table(name: str, limit: int | None = None, spark: Any = None) -> pd.Dat
     """Read a Unity Catalog table (catalog.schema.table) into pandas."""
     if name.count(".") != 2:
         raise ValueError(f"expected a three-level Unity Catalog name catalog.schema.table, got {name!r}")
-    df = (spark or get_spark()).table(name)
+    table = (spark or get_spark()).table(name)
     if limit is not None:
-        df = df.limit(limit)
-    return df.toPandas()
+        table = table.limit(limit)
+    return table.toPandas()

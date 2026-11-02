@@ -15,7 +15,7 @@ A branch (or worktree path) and its task file in `tasks/`.
 0. **One command per Bash call.** No `&&`, `;`, pipes, `cd dir && ...`, or `sed -i`: compound commands need separate approval for every part and stall headless runs. Use the Edit tool to change files and run commands from the project root (git worktrees: `git -C <path> ...`).
 1. Read the task file: objective, owned files, acceptance criteria.
 2. `git diff <integration-branch>...HEAD --stat` then read the full diff. Flag any change outside the task's owned files.
-3. Run the gates and capture output:
+3. Run the gates **yourself in the worker's checkout** (`make -C <worktree> check`, `make -C <worktree> gate`; inspect with `git -C <worktree> ...`; find the path with `git worktree list`) and capture output:
    - `make check` — lint, types, unit tests
    - `make data-check` — data contract / schema tests (if the task touched data)
    - `make gate` — evaluation + metric comparison against `metrics/baseline.json`
@@ -26,9 +26,9 @@ A branch (or worktree path) and its task file in `tasks/`.
    - **Tests:** new behavior has tests; tests were not weakened, skipped, or made trivially true.
    - **Gates untouched:** `configs/gates.json` and `metrics/baseline.json` unchanged unless the task explicitly says so.
 5. If the change alters model behaviour, also ask: does it serve the decision and error costs in the task/design doc, and did it beat the simple baseline? For model changes, request a review from the model-type evaluator (`model-evaluation` skill) and include its verdict. If training looks broken, recommend `training-debugger`; if gains look too good, flag possible leakage.
-6. **Check the proof, not the summary** (`prove-it-works`): compare the worker's EVIDENCE line with `docs/pipeline-map/` - every entry point the diff can affect must be covered or explicitly marked unreachable. Open the artifacts and confirm `git_sha` / run IDs match the branch HEAD. Missing or stale evidence is a high-severity finding.
+6. **Check the proof, not the summary** (`prove-it-works`): compare the worker's EVIDENCE line with `docs/pipeline-map/` - every entry point the diff can affect must be covered or explicitly marked unreachable. Open the artifacts and confirm `git_sha` / run IDs match the branch HEAD. Missing or stale evidence (including a `-dirty` git_sha) is a high-severity finding. `make runs` shows registered versions, aliases, and their source commits read-only.
 7. Only report findings you can tie to a file:line or a command output.
-8. Log the verdict: `python3 scripts/agent-team/audit.py log review <task> supervisor "<verdict>" "<one-line reason>" "<branch HEAD sha>" <approved|changes_requested>` - use `approved` only for a first-round approval with no rework needed.
+8. Log the verdict: `python3 scripts/agent-team/audit.py log review <task> supervisor "<verdict>" "<one-line reason>" "<branch HEAD sha>" <approved|changes_requested>` - use `approved` only for a first-round approval with no rework needed, `approved_after_rework` for later rounds. Use the relative path from the project root.
 
 ## Output (exactly this shape)
 ```
