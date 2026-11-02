@@ -1,0 +1,27 @@
+# Databricks targets (included by Makefile). Requires the Databricks CLI and an authenticated profile.
+TARGET ?= dev
+DB_CONFIG ?= configs/databricks.yaml
+
+.PHONY: bundle-validate bundle-deploy bundle-train bundle-monitor bundle-promote-approve bundle-rollback agents-setup
+
+bundle-validate:
+	databricks bundle validate -t $(TARGET)
+
+bundle-deploy:
+	databricks bundle deploy -t $(TARGET)
+
+bundle-train:
+	databricks bundle run train -t $(TARGET)
+
+bundle-monitor:
+	databricks bundle run monitor -t $(TARGET)
+
+# Human decisions: move @champion, or roll back.
+bundle-promote-approve:
+	databricks bundle run promote_approve -t $(TARGET)
+
+bundle-rollback:
+	databricks bundle run rollback -t $(TARGET)
+
+agents-setup:
+	scripts/databricks/setup-agents.sh

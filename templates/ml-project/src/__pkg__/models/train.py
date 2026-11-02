@@ -71,8 +71,11 @@ def train_and_register(cfg: dict[str, Any], config_path: str) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", required=True)
+    parser.add_argument(
+        "--set", action="append", default=[], metavar="KEY=VALUE", help="override a config value"
+    )
     args = parser.parse_args()
-    train_and_register(load_config(args.config), args.config)
+    train_and_register(load_config(args.config, args.set), args.config)
 
 
 if __name__ == "__main__":

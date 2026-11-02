@@ -37,6 +37,8 @@ How the team works: **[docs/agent-team.md](docs/agent-team.md)**.
 | Use case | Command |
 |---|---|
 | New ML project | `playbook.py new <dir> --name <name> [--bootstrap]` |
+| Databricks ML project | `playbook.py new <dir> --name <name> --platform databricks [--catalog c --schema s]` |
+| Genie Code skills bundle | `playbook.py init <dir> --target genie-code` |
 | Existing repo | `playbook.py init <dir>` — never overwrites; writes `AGENTS.playbook.md` if you already have `AGENTS.md`, merges `.claude/settings.json` |
 | Update vendored files | `playbook.py sync <dir>` — updates untouched files, skips ones you edited (`--force` to overwrite) |
 | Claude Code plugin only | `/plugin install agent-playbook --marketplace mj2tang/coding-agent-playbook` (or `/plugin marketplace add mj2tang/coding-agent-playbook` then `/plugin install agent-playbook@mj2tang`) |
@@ -78,6 +80,14 @@ How the team works: **[docs/agent-team.md](docs/agent-team.md)**.
 6. **Plugin alternative**: `codex plugin marketplace add mj2tang/coding-agent-playbook` registers this repo's Codex marketplace (skills only; install from the Codex app).
 7. **Guardrails**: Codex doesn't run the Claude hooks; rely on `--sandbox` modes, keep network off unless needed, and keep the "Needs human approval" list in `AGENTS.md`.
 
+## Use it on Databricks
+
+- **Agent team through Unity Gateway:** `ug claude --agent orchestrator`; headless workers with `RUNNER=ug-claude` (or `ug-codex`) `scripts/agent-team/run-wave.sh T-001 T-002` — models, limits, and usage governed by Databricks AI Gateway.
+- **Genie Code:** `playbook.py init <dir> --target genie-code` → skills for `.assistant/skills/` (team-only skills left out, `make` steps translated to notebook/job equivalents) + `AGENTS.md`; upload with `genie-code/upload.sh`.
+- **Databricks ML template:** `playbook.py new <dir> --name <project> --platform databricks --catalog <c> --schema <s>` → Unity Catalog data and models (`catalog.schema.model`, same aliases), MLflow on Databricks, an asset bundle with `train` / `monitor` / `promote_approve` / `rollback` jobs, and `ug` setup for MCP servers and UC skills.
+
+Details, prerequisites, and limits: **[docs/databricks.md](docs/databricks.md)**.
+
 ## Keeping the playbook current
 
 `.github/workflows/watch-sources.yml` checks the OpenAI developers blog (official RSS) and MLflow releases every Monday, opens an issue listing new posts, and — if an `ANTHROPIC_API_KEY` secret is set — has Claude draft a PR updating `docs/codex.md`, skills, and `resources.md` for human review. Add feeds in `watch/sources.json`.
@@ -100,6 +110,7 @@ How the team works: **[docs/agent-team.md](docs/agent-team.md)**.
 | Guide | What's inside |
 |---|---|
 | [Team of agents for ML](docs/agent-team.md) | Topology, lifecycle of a feature, running it, tuning, failure modes |
+| [Databricks](docs/databricks.md) | Unity Gateway (`ug`) runners, Genie Code bundle, Databricks ML template (Unity Catalog, asset bundle jobs) |
 | [ML lifecycle (MLOps)](docs/ml-lifecycle.md) | EDA → features → selection → tuning → training → validation → promotion → monitoring → retraining; MLflow conventions; maturity levels |
 | [ML specialist agents](docs/ml-specialists.md) | 8 expert-method agents, when they're used, sources, and a review of ML agents in popular repos |
 | [Foundations](docs/foundations.md) | Context files, prompt shape, plan → implement → verify |
@@ -121,6 +132,7 @@ agents/                  Subagent definitions (orchestrator, supervisor, workers
 hooks/                   hooks.json + guard.py
 templates/ml-project/    ML project skeleton (rendered by `new`)
 templates/agent-config/  AGENTS.md, CLAUDE.md, task board, wave runner (rendered by `new`/`init`)
+templates/platforms/     Databricks overlay (bundle, UC config, ug setup) and Genie Code bundle files
 templates/prompts/       Copy-paste prompts and checklists
 scripts/                 playbook.py (scaffolder) · init.sh (one-line installer) · watch_sources.py (feed watcher)
 watch/                   Feeds to watch + seen-items state

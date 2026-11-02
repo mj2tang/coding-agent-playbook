@@ -1,0 +1,34 @@
+# Weekly drift + retraining check on the latest scoring batch table.
+# The task fails with exit code 3 when retraining is recommended, so on_failure notifications fire.
+resources:
+  jobs:
+    monitor:
+      name: {{project}}-monitor
+      schedule:
+        quartz_cron_expression: "0 0 6 ? * MON"
+        timezone_id: UTC
+      # email_notifications:
+      #   on_failure: [ml-team@example.com]
+      tasks:
+        - task_key: monitor
+          environment_key: default
+          python_wheel_task:
+            package_name: {{pkg}}
+            entry_point: {{pkg}}-monitor
+            parameters:
+              - "--config"
+              - "${workspace.file_path}/configs/databricks.yaml"
+              - "--set"
+              - "mlflow.registered_model=${var.catalog}.${var.schema}.{{pkg}}"
+              - "--set"
+              - "data.table=${var.catalog}.${var.schema}.${var.training_table}"
+              - "--current-table"
+              - "${var.catalog}.${var.schema}.${var.scoring_table}"
+              - "--out"
+              - "/tmp/monitoring.json"
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "5"
+            dependencies:
+              - ../dist/*.whl

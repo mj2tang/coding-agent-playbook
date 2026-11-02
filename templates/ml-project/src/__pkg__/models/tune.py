@@ -47,9 +47,10 @@ def tune(cfg: dict, config_path: str) -> tuple[dict, pd.DataFrame]:
 def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--config", required=True)
+    p.add_argument("--set", action="append", default=[], metavar="KEY=VALUE", help="override a config value")
     p.add_argument("--out", default="configs/experiments/tuned.yaml")
     a = p.parse_args()
-    cfg = load_config(a.config)
+    cfg = load_config(a.config, a.set)
     best, results = tune(cfg, a.config)
     tuned = copy.deepcopy(cfg)
     for key, value in best.items():  # e.g. "clf__C" -> model.C

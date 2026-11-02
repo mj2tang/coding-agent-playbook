@@ -57,12 +57,13 @@ def alias_version(client: MlflowClient, name: str, alias: str) -> str | None:
 def main() -> int:
     p = argparse.ArgumentParser()
     p.add_argument("--config", required=True)
+    p.add_argument("--set", action="append", default=[], metavar="KEY=VALUE", help="override a config value")
     p.add_argument("--version")
     p.add_argument("--approve", action="store_true", help="human approval to make the candidate @champion")
     p.add_argument("--rollback", action="store_true", help="point @champion back to @previous-champion")
     p.add_argument("--rules", default="configs/gates.json")
     a = p.parse_args()
-    cfg = load_config(a.config)
+    cfg = load_config(a.config, a.set)
     name = configure(cfg)
     client = MlflowClient()
 

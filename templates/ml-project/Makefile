@@ -62,3 +62,6 @@ rebaseline: eval
 
 clean:
 	rm -rf .pytest_cache .ruff_cache .mypy_cache metrics/current.json artifacts reports
+
+# Platform-specific targets (present when scaffolded with --platform databricks).
+-include Makefile.databricks

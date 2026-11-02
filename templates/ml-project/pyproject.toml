@@ -12,6 +12,18 @@ dependencies = [
     "mlflow>=3.5",
 ]
 
+[project.optional-dependencies]
+databricks = ["databricks-connect>=15.4", "databricks-sdk>=0.30"]
+
+[project.scripts]
+# Entry points used by Databricks wheel tasks (databricks.yml) and handy locally.
+{{pkg}}-eda = "{{pkg}}.analysis.eda:main"
+{{pkg}}-tune = "{{pkg}}.models.tune:main"
+{{pkg}}-train = "{{pkg}}.models.train:main"
+{{pkg}}-eval = "{{pkg}}.evaluation.run:main"
+{{pkg}}-promote = "{{pkg}}.registry.promote:main"
+{{pkg}}-monitor = "{{pkg}}.monitoring.run:main"
+
 [dependency-groups]
 dev = ["pytest>=8", "ruff>=0.6", "mypy>=1.10", "pandas-stubs", "types-PyYAML"]
 

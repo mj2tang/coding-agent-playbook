@@ -1,0 +1,11 @@
+# Databricks configuration: inherits configs/base.yaml and overrides platform settings.
+# Bundle jobs pass --set overrides for catalog/schema-specific names (see resources/*.yml).
+extends: base.yaml
+data:
+  source: uc_table
+  table: {{catalog}}.{{schema}}.training      # catalog.schema.table; contract in data/contracts.py still applies
+mlflow:
+  tracking_uri: databricks
+  registry_uri: databricks-uc
+  experiment: /Shared/{{project}}             # Databricks experiments are workspace paths
+  registered_model: {{catalog}}.{{schema}}.{{pkg}}   # Unity Catalog three-level name; aliases work the same

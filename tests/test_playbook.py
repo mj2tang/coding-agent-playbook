@@ -100,6 +100,51 @@ class TestScaffolder(unittest.TestCase):
             for agent in team["evaluators"].values():
                 self.assertTrue((proj / ".claude/agents" / f"{agent}.md").exists(), agent)
 
+    def test_databricks_platform_overlay(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = Path(tmp) / "dbx"
+            run("new", str(proj), "--name", "churn-dbx", "--platform", "databricks", "--catalog", "ml", "--schema", "churn")
+            for rel in ["databricks.yml", "resources/train.job.yml", "resources/monitor.job.yml",
+                        "resources/promote.job.yml", "configs/databricks.yaml", "Makefile.databricks",
+                        "scripts/databricks/setup-agents.sh"]:
+                self.assertTrue((proj / rel).exists(), rel)
+            text = "".join((proj / f).read_text() for f in ["databricks.yml", "configs/databricks.yaml", ".mcp.json",
+                                                            "resources/train.job.yml", "AGENTS.md"])
+            self.assertNotIn("{{", text)
+            self.assertIn("ml.churn.churn_dbx", (proj / "configs/databricks.yaml").read_text())
+            self.assertIn('"databricks"', (proj / ".mcp.json").read_text())  # overlay replaced the local MCP config
+            self.assertIn("## Databricks", (proj / "AGENTS.md").read_text())
+            self.assertIn("churn_dbx-train", (proj / "pyproject.toml").read_text())  # wheel entry points for jobs
+            self.assertIn("churn_dbx-train", (proj / "resources/train.job.yml").read_text())
+
+    def test_local_platform_has_no_databricks_files(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = Path(tmp) / "loc"
+            run("new", str(proj), "--name", "loc")
+            self.assertFalse((proj / "databricks.yml").exists())
+            self.assertIn("sqlite", (proj / ".mcp.json").read_text())
+
+    def test_genie_code_bundle(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            run("init", tmp, "--name", "g", "--target", "genie-code")
+            out = Path(tmp) / "genie-code"
+            skills = {p.name for p in (out / ".assistant/skills").iterdir()}
+            self.assertFalse(skills & {"orchestrate-team", "worker-protocol", "merge-train"})
+            self.assertIn("verify-before-done", skills)
+            for skill_md in (out / ".assistant/skills").glob("*/SKILL.md"):
+                text = skill_md.read_text()
+                self.assertTrue(text.startswith("---\nname: "), skill_md)  # frontmatter still first
+                if "make " in text:
+                    self.assertIn("On Databricks Genie Code", text, skill_md)
+            self.assertIn("Genie Code note", (out / "AGENTS.md").read_text())
+            self.assertTrue((out / "upload.sh").exists())
+            self.assertFalse((Path(tmp) / ".claude").exists())  # repo setup not touched
+
+    def test_run_wave_supports_ug_runners(self):
+        text = (ROOT / "templates/agent-config/scripts/agent-team/run-wave.sh").read_text()
+        self.assertIn('ug claude -p "$prompt"', text)
+        self.assertIn('ug codex exec', text)
+
     def test_init_preserves_existing_files_and_settings(self):
         with tempfile.TemporaryDirectory() as tmp:
             repo = Path(tmp)

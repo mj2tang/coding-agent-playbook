@@ -21,9 +21,12 @@ def git_sha() -> str:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", required=True)
+    parser.add_argument(
+        "--set", action="append", default=[], metavar="KEY=VALUE", help="override a config value"
+    )
     parser.add_argument("--out", default="metrics/current.json")
     args = parser.parse_args()
-    cfg = load_config(args.config)
+    cfg = load_config(args.config, args.set)
     set_seed(cfg["seed"])
     train, valid = split(load_dataset(cfg), cfg)
     model = fit(train, cfg)

@@ -17,9 +17,10 @@ from .selection import permutation_ranking, select_features
 def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--config", required=True)
+    p.add_argument("--set", action="append", default=[], metavar="KEY=VALUE", help="override a config value")
     p.add_argument("--out", default="reports/feature_selection.md")
     a = p.parse_args()
-    cfg = load_config(a.config)
+    cfg = load_config(a.config, a.set)
     set_seed(cfg["seed"])
     train, valid = split(load_dataset(cfg), cfg)
     X, y = features_and_target(train, cfg)

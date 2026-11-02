@@ -24,9 +24,15 @@ EXAMPLE_CONTRACT = Contract(
 
 def load_dataset(cfg: dict[str, Any]) -> pd.DataFrame:
     source = cfg["data"]["source"]
-    if source != "sklearn_breast_cancer":
+    if source == "sklearn_breast_cancer":
+        frame = load_breast_cancer(as_frame=True).frame
+    elif source == "uc_table":
+        # Databricks: read the Unity Catalog table named in config; the contract still applies.
+        from ..spark import read_table
+
+        frame = read_table(cfg["data"]["table"], limit=cfg["data"].get("limit"))
+    else:
         raise ValueError(f"unknown data source: {source}")
-    frame = load_breast_cancer(as_frame=True).frame
     return validate(frame, EXAMPLE_CONTRACT)
 
 

@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # Run several board tasks in parallel, headless, one git worktree per task.
 #   scripts/agent-team/run-wave.sh T-001 T-002 T-003
-# Runner: claude (default) or codex — set RUNNER=codex or configs/team.json "headless_runner".
+# Runner: claude (default), codex, ug-claude, or ug-codex — set RUNNER=... or configs/team.json "headless_runner".
+# ug-* runners launch the agent through Databricks Unity AI Gateway (`ug`), which forwards the extra
+# arguments to the agent, so model routing, rate limits, and usage tracking come from the gateway.
 # Each worker follows the worker-protocol skill; review with the supervisor before merging.
 set -euo pipefail
 
@@ -14,6 +16,7 @@ LOG_DIR="$ROOT/.agent-logs"
 mkdir -p "$WT_DIR" "$LOG_DIR"
 
 [ $# -gt 0 ] || { echo "usage: $0 T-001 [T-002 ...]"; exit 1; }
+case "$RUNNER" in ug-*) command -v ug >/dev/null || { echo "RUNNER=$RUNNER needs the Unity Gateway CLI: uv tool install git+https://github.com/databricks/unity-gateway"; exit 1; } ;; esac
 
 pids=()
 for id in "$@"; do
@@ -33,6 +36,8 @@ Do not push. Finish with the worker-protocol summary block."
   case "$RUNNER" in
     claude) (cd "$wt" && claude -p "$prompt" --permission-mode acceptEdits >"$LOG_DIR/$slug.log" 2>&1) & ;;
     codex)  (cd "$wt" && codex exec --sandbox workspace-write "$prompt" >"$LOG_DIR/$slug.log" 2>&1) & ;;
+    ug-claude) (cd "$wt" && ug claude -p "$prompt" --permission-mode acceptEdits >"$LOG_DIR/$slug.log" 2>&1) & ;;
+    ug-codex)  (cd "$wt" && ug codex exec --sandbox workspace-write "$prompt" >"$LOG_DIR/$slug.log" 2>&1) & ;;
     *) echo "unknown RUNNER=$RUNNER"; exit 1 ;;
   esac
   pids+=($!)

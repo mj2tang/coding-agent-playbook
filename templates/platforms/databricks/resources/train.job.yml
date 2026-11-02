@@ -1,0 +1,45 @@
+# Continuous training: train + register a new version, then run the champion/challenger gate.
+# Passing candidates get @challenger; moving @champion is a separate, human-run job (promote_approve).
+resources:
+  jobs:
+    train:
+      name: {{project}}-train
+      # Retrain on a schedule (paused automatically in dev mode); also trigger after monitor recommends it.
+      schedule:
+        quartz_cron_expression: "0 0 3 ? * SUN"
+        timezone_id: UTC
+      # email_notifications:
+      #   on_failure: [ml-team@example.com]
+      tasks:
+        - task_key: train
+          environment_key: default
+          python_wheel_task:
+            package_name: {{pkg}}
+            entry_point: {{pkg}}-train
+            parameters:
+              - "--config"
+              - "${workspace.file_path}/configs/databricks.yaml"
+              - "--set"
+              - "mlflow.registered_model=${var.catalog}.${var.schema}.{{pkg}}"
+              - "--set"
+              - "data.table=${var.catalog}.${var.schema}.${var.training_table}"
+        - task_key: promote_check
+          depends_on:
+            - task_key: train
+          environment_key: default
+          python_wheel_task:
+            package_name: {{pkg}}
+            entry_point: {{pkg}}-promote
+            parameters:
+              - "--config"
+              - "${workspace.file_path}/configs/databricks.yaml"
+              - "--set"
+              - "mlflow.registered_model=${var.catalog}.${var.schema}.{{pkg}}"
+              - "--set"
+              - "data.table=${var.catalog}.${var.schema}.${var.training_table}"
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "5"
+            dependencies:
+              - ../dist/*.whl

@@ -21,15 +21,23 @@ from .retrain import RetrainPolicy, decide_retrain
 def main() -> int:
     p = argparse.ArgumentParser()
     p.add_argument("--config", required=True)
-    p.add_argument("--current", required=True, help="CSV or Parquet of the current scoring batch")
+    p.add_argument("--set", action="append", default=[], metavar="KEY=VALUE", help="override a config value")
+    src = p.add_mutually_exclusive_group(required=True)
+    src.add_argument("--current", help="CSV or Parquet of the current scoring batch")
+    src.add_argument("--current-table", help="Unity Catalog table catalog.schema.table (Databricks)")
     p.add_argument("--model-trained-at", help="ISO timestamp of the serving model (default: now)")
     p.add_argument("--out", default="reports/monitoring.json")
     a = p.parse_args()
-    cfg = load_config(a.config)
+    cfg = load_config(a.config, a.set)
     mcfg = cfg.get("monitoring", {})
     reference, _ = split(load_dataset(cfg), cfg)
-    path = Path(a.current)
-    current = pd.read_parquet(path) if path.suffix == ".parquet" else pd.read_csv(path)
+    if a.current_table:
+        from ..spark import read_table
+
+        current = read_table(a.current_table)
+    else:
+        path = Path(a.current)
+        current = pd.read_parquet(path) if path.suffix == ".parquet" else pd.read_csv(path)
     features = [c for c in reference.columns if c != TARGET]
     report = detect_drift(
         reference,

@@ -1,0 +1,48 @@
+# Human approval step: moves @champion to the passing @challenger and keeps @previous-champion.
+# Run deliberately: databricks bundle run promote_approve -t prod. Restrict who can run it.
+resources:
+  jobs:
+    promote_approve:
+      name: {{project}}-promote-approve
+      tasks:
+        - task_key: promote
+          environment_key: default
+          python_wheel_task:
+            package_name: {{pkg}}
+            entry_point: {{pkg}}-promote
+            parameters:
+              - "--config"
+              - "${workspace.file_path}/configs/databricks.yaml"
+              - "--set"
+              - "mlflow.registered_model=${var.catalog}.${var.schema}.{{pkg}}"
+              - "--set"
+              - "data.table=${var.catalog}.${var.schema}.${var.training_table}"
+              - "--approve"
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "5"
+            dependencies:
+              - ../dist/*.whl
+    rollback:
+      name: {{project}}-rollback
+      tasks:
+        - task_key: rollback
+          environment_key: default
+          python_wheel_task:
+            package_name: {{pkg}}
+            entry_point: {{pkg}}-promote
+            parameters:
+              - "--config"
+              - "${workspace.file_path}/configs/databricks.yaml"
+              - "--set"
+              - "mlflow.registered_model=${var.catalog}.${var.schema}.{{pkg}}"
+              - "--set"
+              - "data.table=${var.catalog}.${var.schema}.${var.training_table}"
+              - "--rollback"
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "5"
+            dependencies:
+              - ../dist/*.whl

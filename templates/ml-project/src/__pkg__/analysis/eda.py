@@ -87,9 +87,10 @@ def to_markdown(p: dict) -> str:
 def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--config", required=True)
+    p.add_argument("--set", action="append", default=[], metavar="KEY=VALUE", help="override a config value")
     p.add_argument("--out", default="reports/eda.md")
     a = p.parse_args()
-    cfg = load_config(a.config)
+    cfg = load_config(a.config, a.set)
     train, _ = split(load_dataset(cfg), cfg)  # EDA on train only: never look at validation
     leakage_auc = cfg.get("feature_selection", {}).get("leakage_auc", 0.98)
     report = profile(train, TARGET, leakage_auc)

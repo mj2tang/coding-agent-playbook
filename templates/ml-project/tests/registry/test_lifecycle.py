@@ -23,7 +23,7 @@ def mlflow_cfg(cfg, tmp_path, monkeypatch):
     (tmp_path / "configs/gates.json").write_text(
         '{"metrics": {"roc_auc": {"direction": "higher", "tolerance": 0.002}}}'
     )
-    monkeypatch.setattr(promote, "load_config", lambda _: cfg)
+    monkeypatch.setattr(promote, "load_config", lambda *_: cfg)
     return cfg
 
 
