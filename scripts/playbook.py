@@ -199,8 +199,14 @@ def cmd_new(a: argparse.Namespace) -> int:
     if not (target / ".git").exists():
         git(target, "init", "-q", "-b", "main")
         git(target, "add", "-A")
-        git(target, "commit", "-q", "-m", f"Scaffold {a.name} with coding-agent-playbook {VERSION}")
-        print("git: initialised repo on main with an initial commit")
+        try:
+            git(target, "commit", "-q", "-m", f"Scaffold {a.name} with coding-agent-playbook {VERSION}")
+            print("git: initialised repo on main with an initial commit")
+        except subprocess.CalledProcessError:
+            # Usually no git identity configured; worktrees need a commit, so tell the user.
+            print("git: initialised repo, but the initial commit failed (is user.name/user.email set?). "
+                  "Commit manually before running the agent team.")
+            return 0 if not a.bootstrap else 1
     if a.bootstrap:
         print("bootstrap: uv sync, make check, make rebaseline ...")
         for step in (["uv", "sync"], ["make", "check"], ["make", "rebaseline"]):
