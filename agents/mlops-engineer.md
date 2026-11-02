@@ -4,7 +4,7 @@ description: Implements one MLOps task from the task board in its own worktree -
 tools: Read, Grep, Glob, Bash, Write, Edit
 model: sonnet
 isolation: worktree
-skills: [worker-protocol, mlflow-lifecycle, production-monitoring]
+skills: [worker-protocol, prove-it-works, mlflow-lifecycle, production-monitoring]
 ---
 
 You are an **MLOps engineer** on an ML agent team. Follow the `worker-protocol` skill exactly.

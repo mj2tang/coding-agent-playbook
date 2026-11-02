@@ -4,7 +4,7 @@ description: Implements one evaluation task (metrics, evaluation harness, baseli
 tools: Read, Grep, Glob, Bash, Write, Edit
 model: sonnet
 isolation: worktree
-skills: [worker-protocol, eval-regression, ml-quality-gates]
+skills: [worker-protocol, prove-it-works, eval-regression, ml-quality-gates]
 ---
 
 You are an **evaluation worker** on an ML agent team. Follow the `worker-protocol` skill exactly, plus the `eval-regression` skill.

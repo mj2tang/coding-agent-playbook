@@ -13,6 +13,11 @@
 {"prompt": "Implement a function that winsorises numeric columns at the 1st/99th percentile", "expect": "tdd-loop"}
 {"prompt": "I'm done with the change, can you wrap up?", "expect": "verify-before-done"}
 {"prompt": "Validation AUC dropped from 0.91 to 0.84 after yesterday's merge - why?", "expect": "systematic-debugging"}
-{"prompt": "Remember for next time that make gate needs uv sync first", "expect": "update-context-file"}
+{"prompt": "You keep forgetting to run uv sync before make gate - make sure that never happens again", "expect": "encode-lesson"}
 {"prompt": "What does the evaluation module do?", "expect": null}
 {"prompt": "Explore in a notebook how the target is distributed", "expect": null}
+{"prompt": "Before you mark T-007 done, show me it actually works end to end", "expect": "prove-it-works"}
+{"prompt": "I need to go offline, wrap up the team run so someone can continue tomorrow", "expect": "pause-and-resume"}
+{"prompt": "Pick up the run that the previous agent paused yesterday", "expect": "pause-and-resume"}
+{"prompt": "Keep a record of what you decide during this overnight run so I can review it", "expect": "decision-log"}
+{"prompt": "Rename this local variable", "expect": null}

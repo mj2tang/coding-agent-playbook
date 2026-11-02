@@ -38,6 +38,10 @@
 - Moving `@champion` (`make promote APPROVE=1`) or rolling back (`make rollback`).
 - Adding dependencies.
 
+## Proof and trail
+- Prove changes on the real artifact through every affected entry point in `docs/pipeline-map/` (`prove-it-works`); keep the pipeline map current in the same PR.
+- Log decisions with `python3 scripts/agent-team/audit.py log ...` (`.audit/decisions.tsv`, local). Parallelism follows `audit.py trust`.
+
 ## Agent team
 - Orchestrator (`claude --agent orchestrator`) plans tasks and dispatches workers; workers each run in their own worktree on `task/<id>-<slug>`; the supervisor reviews every branch before merge. Protocols: skills `orchestrate-team`, `worker-protocol`, `merge-train`.
 - Read `tasks/<id>.md` before working on a task; keep its status current.

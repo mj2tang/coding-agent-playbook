@@ -81,13 +81,19 @@ class TestScaffolder(unittest.TestCase):
             for rel in ["AGENTS.md", "CLAUDE.md", "Makefile", "src/churn_model/models/train.py",
                         ".claude/agents/orchestrator.md", ".claude/hooks/guard.py",
                         ".agents/skills/worker-protocol/SKILL.md", "tasks/BOARD.md",
-                        "scripts/agent-team/run-wave.sh", ".agents/playbook.lock.json"]:
+                        "scripts/agent-team/run-wave.sh", "scripts/agent-team/audit.py",
+                        "docs/pipeline-map/README.md", "docs/pipeline-map/training.md",
+                        ".agents/skills/prove-it-works/SKILL.md", ".agents/playbook.lock.json"]:
                 self.assertTrue((proj / rel).exists(), rel)
             self.assertTrue((proj / ".claude/skills").is_symlink())
             self.assertNotIn("{{", (proj / "AGENTS.md").read_text())
             self.assertNotIn("__pkg__", "".join(str(p) for p in proj.rglob("*")))
             settings = json.loads((proj / ".claude/settings.json").read_text())
             self.assertIn("Bash(make gate)", settings["permissions"]["allow"])
+            self.assertIn(".audit/", (proj / ".gitignore").read_text())
+            self.assertNotIn("{{", (proj / "docs/pipeline-map/batch-scoring.md").read_text())
+            team = json.loads((proj / "configs/team.json").read_text())
+            self.assertEqual(team["trust"]["start_workers"], 1)
             log = subprocess.run(["git", "-C", str(proj), "log", "--oneline"], capture_output=True, text=True)
             self.assertIn("Scaffold churn-model", log.stdout)
 

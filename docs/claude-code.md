@@ -32,4 +32,4 @@
 ## Session habits
 - Plan mode (Shift+Tab) for non-trivial work; `/clear` between tasks; `/compact` on long sessions.
 - `claude -p "…"` for headless runs (scripts, CI, `run-wave.sh`).
-- End sessions with the `update-context-file` skill so lessons land in `AGENTS.md`.
+- When you correct an agent twice, run the `encode-lesson` skill: turn the lesson into a test, contract, lint, or hook rule, and use `AGENTS.md` text only for judgment calls.

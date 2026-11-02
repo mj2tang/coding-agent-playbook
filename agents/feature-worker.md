@@ -4,7 +4,7 @@ description: Implements one ML feature task (model, training, feature engineerin
 tools: Read, Grep, Glob, Bash, Write, Edit
 model: sonnet
 isolation: worktree
-skills: [worker-protocol, tdd-loop, ml-quality-gates]
+skills: [worker-protocol, prove-it-works, tdd-loop, ml-quality-gates]
 ---
 
 You are a **feature worker** on an ML agent team. Follow the `worker-protocol` skill exactly.

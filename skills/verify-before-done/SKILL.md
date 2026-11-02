@@ -18,4 +18,6 @@ Then report:
 - Each command and whether it passed (paste the failing lines if not).
 - What you did **not** verify and why.
 
+For anything beyond a small edit, also follow `prove-it-works`: cover every affected entry point in `docs/pipeline-map/` and record the evidence.
+
 Never write "done", "fixed", or "all tests pass" without having run the commands in this session.

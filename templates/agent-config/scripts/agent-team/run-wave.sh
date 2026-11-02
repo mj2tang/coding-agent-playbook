@@ -18,6 +18,13 @@ LOG_DIR="$ROOT/.agent-logs"
 mkdir -p "$WT_DIR" "$LOG_DIR"
 
 [ $# -gt 0 ] || { echo "usage: $0 T-001 [T-002 ...]"; exit 1; }
+# Trust ladder: parallelism is earned from the decision trail (scripts/agent-team/audit.py trust).
+ALLOWED=$(python3 "$ROOT/scripts/agent-team/audit.py" trust 2>/dev/null || echo 1)
+if [ "$#" -gt "$ALLOWED" ] && [ "${FORCE:-0}" != "1" ]; then
+  echo "Trust ladder allows $ALLOWED parallel worker(s); got $# tasks."
+  echo "Run fewer tasks, see 'python3 scripts/agent-team/audit.py trust --explain', or override with FORCE=1."
+  exit 1
+fi
 case "$RUNNER" in ug-*) command -v ug >/dev/null || { echo "RUNNER=$RUNNER needs the Unity Gateway CLI: uv tool install git+https://github.com/databricks/unity-gateway"; exit 1; } ;; esac
 
 pids=()
@@ -35,6 +42,7 @@ Task file: $task. Branch: $branch (already checked out in this worktree).
 Gate: make check, plus make data-check / make gate if the task touches data or models.
 Do not push. Finish with the worker-protocol summary block."
   echo "▶ $id → $wt ($RUNNER)"
+  python3 "$ROOT/scripts/agent-team/audit.py" log dispatch "$id" "run-wave:$RUNNER" "dispatched $branch" "wave of $# within trust limit $ALLOWED" "$wt" started || true
   case "$RUNNER" in
     claude) (cd "$wt" && claude -p "$prompt" --permission-mode acceptEdits >"$LOG_DIR/$slug.log" 2>&1) & ;;
     codex)  (cd "$wt" && codex exec --sandbox workspace-write "$prompt" >"$LOG_DIR/$slug.log" 2>&1) & ;;

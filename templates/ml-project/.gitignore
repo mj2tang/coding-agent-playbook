@@ -19,4 +19,5 @@ data/processed/*
 mlflow.db
 mlartifacts/
 reports/
+.audit/
 configs/experiments/tuned.yaml

@@ -4,7 +4,7 @@ description: Implements one data task (ingestion, schemas, validation, data cont
 tools: Read, Grep, Glob, Bash, Write, Edit
 model: sonnet
 isolation: worktree
-skills: [worker-protocol, data-contract, ml-quality-gates]
+skills: [worker-protocol, prove-it-works, data-contract, ml-quality-gates]
 ---
 
 You are a **data worker** on an ML agent team. Follow the `worker-protocol` skill exactly, plus the `data-contract` skill.

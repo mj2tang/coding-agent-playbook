@@ -24,6 +24,17 @@ A setup for running **parallel feature development** on an ML codebase with an o
                        merge-train → main (make gate after every merge)
 ```
 
+## Trust before parallelism
+
+Adapted from Lauren Tan's ("poteto") approach in [pstack](https://github.com/poteto/plugins): throughput comes from trust, not from the number of agents.
+
+- **Earned parallelism.** `python3 scripts/agent-team/audit.py trust` replays the decision trail: the team starts at `trust.start_workers` (1), gains a worker after `trust.promote_after` (3) consecutive first-round approvals, and loses one after a revert or human rework - capped at `max_parallel_workers`. `run-wave.sh` refuses larger waves unless `FORCE=1`.
+- **Proof on the real artifact.** `docs/pipeline-map/` lists every way the system is used (data, training, evaluation, promotion, batch scoring, monitoring), how to drive each, the evidence that counts, and what usually lies. Workers cover every entry point their change can affect (`prove-it-works`) and return an EVIDENCE line; the supervisor checks the artifacts, not the summary.
+- **Decision trail.** One TSV row per dispatch, verdict, merge, revert, pivot, or blocker (`decision-log`), local in `.audit/` by default; commit a copy for large unattended runs.
+- **Lessons become mechanisms.** A correction becomes a type/contract, test, lint, hook rule, or helper before it becomes `AGENTS.md` text (`encode-lesson`).
+- **Autonomous runs have a finish line.** A checkable exit condition up front, stop after two no-progress waves, never relax the condition; `pause-and-resume` leaves `tasks/RESUME.md` for a clean handoff.
+- **Settle forks by evidence.** Observable questions (which feature set scores better?) get a probe, not a question to the human.
+
 ## Specialists
 Eight advisory agents bring expert ML method into the loop — `ml-problem-framer`, `experiment-scientist`, `training-debugger`, `error-analyst`, `ranking-ctr-specialist`, `llm-eval-engineer`, `ml-production-auditor`, `ab-test-analyst`. The orchestrator calls them at set moments (see `configs/team.json` → `specialists`). Details and sources: [ml-specialists.md](ml-specialists.md).
 
