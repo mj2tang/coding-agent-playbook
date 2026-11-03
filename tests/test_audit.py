@@ -72,6 +72,24 @@ class TestDecisionLog(unittest.TestCase):
             self.assertEqual(out, "2")  # defaults: start 1, +1 after 3 clean approvals
 
 
+class TestSharedTrailAcrossWorktrees(unittest.TestCase):
+    def test_rows_from_a_worktree_land_in_the_main_trail(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            main = Path(tmp) / "main"
+            main.mkdir()
+            git = ["git", "-c", "user.name=t", "-c", "user.email=t@t"]
+            subprocess.run([*git, "init", "-q", "-b", "main", str(main)], check=True)
+            subprocess.run([*git, "-C", str(main), "commit", "-q", "--allow-empty", "-m", "i"], check=True)
+            wt = Path(tmp) / "wt"
+            subprocess.run([*git, "-C", str(main), "worktree", "add", "-q", str(wt), "-b", "task/x"], check=True)
+            env = {k: v for k, v in os.environ.items() if k != "AUDIT_LOG"}
+            for cwd in (wt, main):
+                subprocess.run([sys.executable, str(AUDIT), "log", "verify", "T-1", "worker", "d", "w", "e",
+                                "GATE: PASS"], cwd=cwd, env=env, check=True)
+            self.assertEqual(len(audit.read(main / ".audit/decisions.tsv")), 2)
+            self.assertFalse((wt / ".audit").exists())
+
+
 class TestRunWaveEnforcement(unittest.TestCase):
     def test_refuses_wave_larger_than_trust(self):
         with tempfile.TemporaryDirectory() as tmp:

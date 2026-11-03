@@ -24,6 +24,7 @@ import csv
 import json
 import os
 import re
+import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -48,7 +49,20 @@ DEFAULT_TRUST = {"start_workers": 1, "max_workers": 3, "promote_after": 3}
 
 
 def log_path() -> Path:
-    return Path(os.environ.get("AUDIT_LOG", ".audit/decisions.tsv"))
+    """AUDIT_LOG if set; else .audit/decisions.tsv in the main checkout, so rows written from any
+    git worktree (each worker runs in one) land in the same trail the trust ladder reads."""
+    if "AUDIT_LOG" in os.environ:
+        return Path(os.environ["AUDIT_LOG"])
+    try:
+        common = subprocess.run(
+            ["git", "rev-parse", "--path-format=absolute", "--git-common-dir"],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.strip()
+    except (OSError, subprocess.CalledProcessError):
+        return Path(".audit/decisions.tsv")
+    return Path(common).parent / ".audit" / "decisions.tsv"
 
 
 def clean(cell: str) -> str:
