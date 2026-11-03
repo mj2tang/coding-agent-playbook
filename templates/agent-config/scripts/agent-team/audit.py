@@ -43,6 +43,7 @@ NEUTRAL = {
     "paused",
     "encoded",
     "started",
+    "forced",
 }
 NEGATIVE = {"reverted", "human_rework"}
 DEFAULT_TRUST = {"start_workers": 1, "max_workers": 3, "promote_after": 3}

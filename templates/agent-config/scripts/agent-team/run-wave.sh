@@ -20,12 +20,26 @@ mkdir -p "$WT_DIR" "$LOG_DIR"
 [ $# -gt 0 ] || { echo "usage: $0 T-001 [T-002 ...]"; exit 1; }
 # Trust ladder: parallelism is earned from the decision trail (scripts/agent-team/audit.py trust).
 ALLOWED=$(python3 "$ROOT/scripts/agent-team/audit.py" trust 2>/dev/null || echo 1)
+if [ "$#" -gt "$ALLOWED" ] && [ "${FORCE:-0}" = "1" ]; then
+  python3 "$ROOT/scripts/agent-team/audit.py" log dispatch "$*" "run-wave" "forced wave of $# over trust limit $ALLOWED" \
+    "FORCE=1 set by the operator" "run-wave.sh" forced || true
+fi
 if [ "$#" -gt "$ALLOWED" ] && [ "${FORCE:-0}" != "1" ]; then
   echo "Trust ladder allows $ALLOWED parallel worker(s); got $# tasks."
   echo "Run fewer tasks, see 'python3 scripts/agent-team/audit.py trust --explain', or override with FORCE=1."
   exit 1
 fi
 case "$RUNNER" in ug-*) command -v ug >/dev/null || { echo "RUNNER=$RUNNER needs the Unity Gateway CLI: uv tool install git+https://github.com/databricks/unity-gateway"; exit 1; } ;; esac
+
+# Headless runs ignore the project's permissions.allow until the folder is trusted interactively.
+# ALLOW_FROM_SETTINGS=1 passes that allow list to each claude worker instead - only for repos you trust.
+ALLOW_ARGS=()
+if [ "${ALLOW_FROM_SETTINGS:-0}" = "1" ] && [ -f "$ROOT/.claude/settings.json" ]; then
+  while IFS= read -r rule; do ALLOW_ARGS+=("$rule"); done < <(python3 -c \
+    "import json,sys; print('\\n'.join(json.load(open(sys.argv[1])).get('permissions', {}).get('allow', [])))" \
+    "$ROOT/.claude/settings.json")
+  ALLOW_ARGS=(--allowedTools Read Edit Write Glob Grep "${ALLOW_ARGS[@]}")
+fi
 
 pids=()
 for id in "$@"; do
@@ -44,9 +58,9 @@ Do not push. Finish with the worker-protocol summary block."
   echo "▶ $id → $wt ($RUNNER)"
   python3 "$ROOT/scripts/agent-team/audit.py" log dispatch "$id" "run-wave:$RUNNER" "dispatched $branch" "wave of $# within trust limit $ALLOWED" "$wt" started || true
   case "$RUNNER" in
-    claude) (cd "$wt" && claude -p "$prompt" --permission-mode acceptEdits >"$LOG_DIR/$slug.log" 2>&1) & ;;
+    claude) (cd "$wt" && claude -p "$prompt" --permission-mode acceptEdits ${ALLOW_ARGS[@]+"${ALLOW_ARGS[@]}"} >"$LOG_DIR/$slug.log" 2>&1) & ;;
     codex)  (cd "$wt" && codex exec --sandbox workspace-write "$prompt" >"$LOG_DIR/$slug.log" 2>&1) & ;;
-    ug-claude) (cd "$wt" && ug claude -p "$prompt" --permission-mode acceptEdits >"$LOG_DIR/$slug.log" 2>&1) & ;;
+    ug-claude) (cd "$wt" && ug claude -p "$prompt" --permission-mode acceptEdits ${ALLOW_ARGS[@]+"${ALLOW_ARGS[@]}"} >"$LOG_DIR/$slug.log" 2>&1) & ;;
     ug-codex)  (cd "$wt" && ug codex exec --sandbox workspace-write "$prompt" >"$LOG_DIR/$slug.log" 2>&1) & ;;
     *) echo "unknown RUNNER=$RUNNER"; exit 1 ;;
   esac
