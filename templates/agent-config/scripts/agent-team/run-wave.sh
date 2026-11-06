@@ -56,7 +56,7 @@ Task file: $task. Branch: $branch (already checked out in this worktree).
 Gate: make check, plus make data-check / make gate if the task touches data or models.
 Do not push. Finish with the worker-protocol summary block."
   echo "▶ $id → $wt ($RUNNER)"
-  python3 "$ROOT/scripts/agent-team/audit.py" log dispatch "$id" "run-wave:$RUNNER" "dispatched $branch" "wave of $# within trust limit $ALLOWED" "$wt" started || true
+  python3 "$ROOT/scripts/agent-team/audit.py" log dispatch "$id" "run-wave:$RUNNER" "dispatched $branch" "wave of $# (trust limit $ALLOWED$([ "$#" -gt "$ALLOWED" ] && echo ", forced"))" "$wt" started || true
   case "$RUNNER" in
     claude) (cd "$wt" && claude -p "$prompt" --permission-mode acceptEdits ${ALLOW_ARGS[@]+"${ALLOW_ARGS[@]}"} >"$LOG_DIR/$slug.log" 2>&1) & ;;
     codex)  (cd "$wt" && codex exec --sandbox workspace-write "$prompt" >"$LOG_DIR/$slug.log" 2>&1) & ;;
