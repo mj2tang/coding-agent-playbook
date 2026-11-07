@@ -15,6 +15,7 @@ description: The contract every worker agent follows - claim one task file, stay
 4. **Test first** (`tdd-loop`): write failing tests from the acceptance criteria, then implement.
 5. **Gates:** run `make check`, plus `make data-check` / `make gate` when the task touches data or models. Fix until green. Never weaken a test, threshold, or baseline.
 5a. **Commit, then prove.** Commit your change before running the proof commands: metrics and MLflow runs record the commit, and results from uncommitted code carry a `-dirty` SHA that doesn't count as proof.
+    **Codex (run-wave):** the `workspace-write` sandbox keeps `.git` read-only, so you can't commit. Don't retry or report it as a blocker: run the gates on your final changes, leave them uncommitted, and the runner commits your owned files when you exit. The supervisor runs the proof on that commit.
 5b. **Prove it** (`prove-it-works`): exercise every `docs/pipeline-map/` entry point the change can affect on this branch's HEAD, and log one `verify` row per entry point with its evidence pointer.
 5c. **Settle forks by evidence:** if you're unsure between two approaches and the answer is observable (a metric, a runtime, an output), run a quick probe instead of returning `blocked`. Block only for genuine scope or preference questions.
 6. **Commit** small logical commits: `T-<id>: <what>`. Do not push or merge.

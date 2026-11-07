@@ -293,7 +293,8 @@ def cmd_new(a: argparse.Namespace) -> int:
         print("bootstrap: uv sync, make check, make rebaseline ...")
         for step in (["uv", "sync"], ["make", "check"], ["make", "rebaseline"]):
             subprocess.run(step, cwd=target, check=True)
-        git(target, "add", "metrics/baseline.json")
+        # uv.lock too: worktrees are checked out from git, so an uncommitted lock leaves workers unpinned.
+        git(target, "add", "metrics/baseline.json", "uv.lock")
         git(target, "commit", "-q", "-m", "Initial metrics baseline")
     else:
         print("next: cd into the project, run `make setup && make check`, then `make rebaseline` and commit it")

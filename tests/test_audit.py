@@ -105,6 +105,43 @@ class TestRunWaveEnforcement(unittest.TestCase):
             wt = proj.parent / "p-worktrees"
             self.assertFalse(wt.exists() and any(wt.iterdir()))  # nothing dispatched
 
+    def test_codex_runner_commits_owned_files_only(self):
+        # Codex's sandbox keeps .git read-only, so the runner commits for the worker.
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = Path(tmp) / "p"
+            subprocess.run([sys.executable, str(ROOT / "scripts/playbook.py"), "new", str(proj), "--name", "p"],
+                           check=True, capture_output=True)
+            (proj / "tasks/T-001-x.md").write_text(
+                "---\nid: T-001\nowned_files:\n  - src/p/features/build.py\n  - tests/features/  # new tests\n---\n")
+            git = ["git", "-c", "user.name=t", "-c", "user.email=t@t", "-C", str(proj)]
+            subprocess.run([*git, "add", "-A"], check=True)
+            subprocess.run([*git, "commit", "-qm", "task"], check=True)
+            bin_dir = Path(tmp) / "bin"
+            bin_dir.mkdir()
+            fake = bin_dir / "codex"
+            fake.write_text('#!/bin/sh\nprintf "%s\\n" "$@" > "$ARGS_OUT"\n'
+                            'echo "# x" >> src/p/features/build.py\nmkdir -p tests/features\n'
+                            'echo "def test_x(): pass" > tests/features/test_x.py\necho stray > README.md\n')
+            fake.chmod(0o755)
+            env = {**os.environ, "PATH": f"{bin_dir}:{os.environ['PATH']}", "RUNNER": "codex",
+                   "ARGS_OUT": str(Path(tmp) / "args"), "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t",
+                   "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@t"}
+            r = subprocess.run(["bash", "scripts/agent-team/run-wave.sh", "T-001"], cwd=proj, env=env,
+                               capture_output=True, text=True)
+            self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+            wt = proj.parent / "p-worktrees/T-001-x"
+            committed = subprocess.run(["git", "-C", str(wt), "show", "--name-only", "--format=%s", "HEAD"],
+                                       capture_output=True, text=True, check=True).stdout
+            self.assertIn("T-001: worker changes", committed)
+            self.assertIn("src/p/features/build.py", committed)
+            self.assertIn("tests/features/test_x.py", committed)
+            self.assertNotIn("README.md", committed)
+            log = (proj / ".agent-logs/T-001-x.log").read_text()
+            self.assertIn("outside owned_files", log)
+            self.assertIn("README.md", log)
+            self.assertIn("workspace-write", (Path(tmp) / "args").read_text())
+            self.assertEqual((proj / ".agent-logs/.gitignore").read_text().strip(), "*")
+
 
 if __name__ == "__main__":
     unittest.main()

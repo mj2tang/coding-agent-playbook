@@ -26,7 +26,7 @@
 - **Parallelise across threads, isolate with git worktrees** (`codex exec --worktree` or your own worktrees).
 
 ## Headless and CI
-- `codex exec "<prompt>"` runs non-interactively; `--sandbox workspace-write` for implementation, `read-only` for review; `--json` emits an event trace you can assert on; `-C <dir>` sets the working root; `--output-schema` enforces structured output.
+- `codex exec "<prompt>"` runs non-interactively; `--sandbox workspace-write` for implementation and for reviews that run gates (`read-only` only for diff-reading judges; `.git` is read-only in both, so headless Codex can't commit — `run-wave.sh` commits for it); `--add-dir` makes extra paths writable (worktrees, `uv cache dir`); `--json` emits an event trace you can assert on; `-C <dir>` sets the working root; `--output-schema` enforces structured output.
 - This playbook's `scripts/agent-team/run-wave.sh` with `RUNNER=codex` runs one `codex exec` per task in its own worktree.
 
 ## Approvals and sandbox

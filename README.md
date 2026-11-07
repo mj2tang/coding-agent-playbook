@@ -76,9 +76,10 @@ How the team works: **[docs/agent-team.md](docs/agent-team.md)**.
    codex mcp add mlflow-mcp --env MLFLOW_TRACKING_URI=sqlite:///mlflow.db --env MLFLOW_MCP_TOOLS=all \
      -- uv run --with "mlflow[mcp]>=3.5.1" mlflow mcp run
    ```
-4. **Parallel workers**: `RUNNER=codex scripts/agent-team/run-wave.sh T-001 T-002` runs one `codex exec --sandbox workspace-write` per task, each in its own worktree. Role prompts live in `.claude/agents/*.md` — they're plain markdown, so you can hand them to Codex directly, e.g. supervisor review:
+4. **Parallel workers**: `RUNNER=codex scripts/agent-team/run-wave.sh T-001 T-002` runs one `codex exec --sandbox workspace-write` per task, each in its own worktree. Codex's sandbox keeps `.git` read-only, so the runner syncs each worktree's env first (no network inside the sandbox) and commits the worker's `owned_files` when it exits (`CODEX_APPROVE_FOR_ME=1` lets Codex's automatic reviewer approve the commit instead). Role prompts live in `.claude/agents/*.md` — they're plain markdown, so you can hand them to Codex directly, e.g. supervisor review (`workspace-write`, not `read-only`: the gates write caches, metrics, and the audit trail; `.git` stays read-only):
    ```bash
-   codex exec --sandbox read-only "Act as the supervisor defined in .claude/agents/supervisor.md. Review branch task/T-001-<slug> against tasks/T-001-<slug>.md."
+   codex exec --sandbox workspace-write --add-dir ../<project>-worktrees/T-001-<slug> --add-dir "$(uv cache dir)" \
+     "Act as the supervisor defined in .claude/agents/supervisor.md. Review branch task/T-001-<slug> against tasks/T-001-<slug>.md."
    ```
 5. **Code review**: Codex review (`@codex review` on GitHub) applies the `## Code Review Rules` in `AGENTS.md` (leakage, reproducibility, evaluation integrity, data boundaries).
 6. **Plugin alternative**: `codex plugin marketplace add mj2tang/coding-agent-playbook` registers this repo's Codex marketplace (skills only; install from the Codex app).
